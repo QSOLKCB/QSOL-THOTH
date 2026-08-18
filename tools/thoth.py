@@ -17,6 +17,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 TOKEN = re.compile(r"^[a-z0-9_.-]+$")
+CONCAP_ID = re.compile(r"^concap\.[a-z0-9_.-]+/[1-9][0-9]*$")
 SHA256 = re.compile(r"^sha256:[0-9a-f]{64}$")
 
 REGISTRY_PATH = ROOT / "ai" / "concap-registry.json"
@@ -26,14 +27,26 @@ REQUEST_SCHEMA_PATH = ROOT / "schema" / "route-request.schema.json"
 DECISION_SCHEMA_PATH = ROOT / "schema" / "route-decision.schema.json"
 IMPLEMENTATION_PATH = ROOT / "tools" / "thoth.py"
 
-DECISION_BOUNDARIES = [
+DECISION_BOUNDARIES = (
     "ROUTING != FACTUAL_AUTHORITY",
     "STYLE_SWITCH != EPISTEMIC_SWITCH",
     "STYLE_SUPPORT != EVIDENCE",
     "CONCAP_ID != CAPSULE_BYTES",
+    "ROUTE_DECISION != CAPSULE_AVAILABILITY",
     "SELECTED != LOADED",
     "LOADED != TRUE",
-]
+)
+
+JSON_SCHEMA_DRAFT = "https://json-schema.org/draft/2020-12/schema"
+SCHEMA_TOP_KEYS = {
+    "$schema",
+    "$id",
+    "title",
+    "type",
+    "additionalProperties",
+    "required",
+    "properties",
+}
 
 
 class ThothError(Exception):
@@ -49,18 +62,27 @@ def _reject_duplicate_pairs(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
     return result
 
 
+def path_label(path: Path) -> str:
+    """Return a stable diagnostic label without assuming the path is under ROOT."""
+    try:
+        return path.relative_to(ROOT).as_posix()
+    except ValueError:
+        return str(path)
+
+
 def load_json(path: Path) -> dict[str, Any]:
+    label = path_label(path)
     if path.is_symlink():
-        raise ThothError(f"refusing symlinked contract: {path.relative_to(ROOT)}")
+        raise ThothError(f"refusing symlinked contract: {label}")
     try:
         value = json.loads(
             path.read_text(encoding="utf-8"),
             object_pairs_hook=_reject_duplicate_pairs,
         )
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise ThothError(f"cannot load {path.relative_to(ROOT)}: {exc}") from exc
+        raise ThothError(f"cannot load {label}: {exc}") from exc
     if not isinstance(value, dict):
-        raise ThothError(f"{path.relative_to(ROOT)} must contain a JSON object")
+        raise ThothError(f"{label} must contain a JSON object")
     return value
 
 
@@ -110,6 +132,97 @@ def configuration_digest() -> str:
     return "sha256:" + digest.hexdigest()
 
 
+def validate_schema_header(schema: dict[str, Any], where: str) -> dict[str, Any]:
+    exact_keys(schema, SCHEMA_TOP_KEYS, where)
+    require(schema["$schema"] == JSON_SCHEMA_DRAFT, f"{where}: unexpected JSON Schema draft")
+    require(isinstance(schema["$id"], str) and schema["$id"], f"{where}: $id must be non-empty")
+    require(isinstance(schema["title"], str) and schema["title"], f"{where}: title must be non-empty")
+    require(schema["type"] == "object", f"{where}: top-level type must be object")
+    require(schema["additionalProperties"] is False, f"{where}: additionalProperties must be false")
+    required = schema["required"]
+    require(isinstance(required, list), f"{where}: required must be an array")
+    require(len(required) == len(set(required)), f"{where}: duplicate required field")
+    properties = schema["properties"]
+    require(isinstance(properties, dict), f"{where}: properties must be an object")
+    return properties
+
+
+def validate_token_property(value: Any, where: str, *, min_length: bool) -> None:
+    require(isinstance(value, dict), f"{where}: property contract must be an object")
+    keys = {"type", "pattern", "minLength"} if min_length else {"type", "pattern"}
+    exact_keys(value, keys, where)
+    require(value["type"] == "string", f"{where}: type must be string")
+    require(value["pattern"] == "^[a-z0-9_.-]+$", f"{where}: token pattern drift detected")
+    if min_length:
+        require(value["minLength"] == 1, f"{where}: minLength must be 1")
+
+
+def validate_sha_property(value: Any, where: str) -> None:
+    require(isinstance(value, dict), f"{where}: property contract must be an object")
+    exact_keys(value, {"type", "pattern"}, where)
+    require(value["type"] == "string", f"{where}: type must be string")
+    require(value["pattern"] == "^sha256:[0-9a-f]{64}$", f"{where}: SHA-256 pattern drift detected")
+
+
+def validate_string_array_property(value: Any, where: str) -> None:
+    require(isinstance(value, dict), f"{where}: property contract must be an object")
+    exact_keys(value, {"type", "items", "uniqueItems"}, where)
+    require(value["type"] == "array", f"{where}: type must be array")
+    require(value["uniqueItems"] is True, f"{where}: uniqueItems must be true")
+    items = value["items"]
+    require(isinstance(items, dict), f"{where}.items must be an object")
+    exact_keys(items, {"type", "minLength"}, f"{where}.items")
+    require(items["type"] == "string", f"{where}.items: type must be string")
+    require(items["minLength"] == 1, f"{where}.items: minLength must be 1")
+
+
+def validate_request_schema(schema: dict[str, Any]) -> None:
+    where = "route request schema"
+    properties = validate_schema_header(schema, where)
+    required = schema["required"]
+    require(set(required) == {"protocol", "intent"} and len(required) == 2, f"{where}: required fields drift detected")
+    exact_keys(properties, {"protocol", "intent", "style"}, f"{where}.properties")
+
+    protocol = properties["protocol"]
+    require(isinstance(protocol, dict), f"{where}.protocol must be an object")
+    exact_keys(protocol, {"const"}, f"{where}.protocol")
+    require(protocol["const"] == "QSOL-THOTH/ROUTE-REQUEST/1", f"{where}: protocol constant drift detected")
+    validate_token_property(properties["intent"], f"{where}.intent", min_length=True)
+    validate_token_property(properties["style"], f"{where}.style", min_length=True)
+
+
+def validate_decision_schema(schema: dict[str, Any]) -> None:
+    where = "route decision schema"
+    properties = validate_schema_header(schema, where)
+    required_fields = {
+        "protocol",
+        "canonical_intent",
+        "style",
+        "concaps",
+        "request_sha256",
+        "configuration_sha256",
+        "implementation_sha256",
+        "decision_sha256",
+        "boundaries",
+    }
+    required = schema["required"]
+    require(set(required) == required_fields and len(required) == len(required_fields), f"{where}: required fields drift detected")
+    exact_keys(properties, required_fields, f"{where}.properties")
+
+    protocol = properties["protocol"]
+    require(isinstance(protocol, dict), f"{where}.protocol must be an object")
+    exact_keys(protocol, {"const"}, f"{where}.protocol")
+    require(protocol["const"] == "QSOL-THOTH/ROUTE-DECISION/1", f"{where}: protocol constant drift detected")
+    validate_token_property(properties["canonical_intent"], f"{where}.canonical_intent", min_length=False)
+    validate_token_property(properties["style"], f"{where}.style", min_length=False)
+    validate_string_array_property(properties["concaps"], f"{where}.concaps")
+    validate_sha_property(properties["request_sha256"], f"{where}.request_sha256")
+    validate_sha_property(properties["configuration_sha256"], f"{where}.configuration_sha256")
+    validate_sha_property(properties["implementation_sha256"], f"{where}.implementation_sha256")
+    validate_sha_property(properties["decision_sha256"], f"{where}.decision_sha256")
+    validate_string_array_property(properties["boundaries"], f"{where}.boundaries")
+
+
 def validate_registry(registry: dict[str, Any]) -> tuple[dict[str, int], set[str]]:
     exact_keys(
         registry,
@@ -134,7 +247,7 @@ def validate_registry(registry: dict[str, Any]) -> tuple[dict[str, int], set[str
         )
         capsule_id = item["id"]
         order = item["order"]
-        require(isinstance(capsule_id, str) and capsule_id.startswith("concap.") and capsule_id.endswith("/1"), f"invalid CONCAP id: {capsule_id!r}")
+        require(isinstance(capsule_id, str) and CONCAP_ID.fullmatch(capsule_id) is not None, f"invalid CONCAP id: {capsule_id!r}")
         require(capsule_id not in order_by_id, f"duplicate CONCAP id: {capsule_id}")
         require(isinstance(order, int) and not isinstance(order, bool) and order > 0, f"invalid CONCAP order for {capsule_id}")
         require(order not in orders, f"duplicate CONCAP order: {order}")
@@ -239,6 +352,7 @@ def validate_router(router: dict[str, Any], known_capsules: set[str], style_ids:
     boundaries = router["boundaries"]
     require(isinstance(boundaries, list), "router boundaries must be an array")
     require("ROUTING != FACTUAL_AUTHORITY" in boundaries, "router missing factual-authority boundary")
+    require("ROUTE_DECISION != CAPSULE_AVAILABILITY" in boundaries, "router missing capsule-availability boundary")
     return token_map
 
 
@@ -246,9 +360,11 @@ def load_and_validate() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any],
     registry = load_json(REGISTRY_PATH)
     style_machine = load_json(STYLE_PATH)
     router = load_json(ROUTER_PATH)
-    load_json(REQUEST_SCHEMA_PATH)
-    load_json(DECISION_SCHEMA_PATH)
+    request_schema = load_json(REQUEST_SCHEMA_PATH)
+    decision_schema = load_json(DECISION_SCHEMA_PATH)
 
+    validate_request_schema(request_schema)
+    validate_decision_schema(decision_schema)
     order_by_id, known_capsules = validate_registry(registry)
     style_ids = validate_style_machine(style_machine, known_capsules)
     token_map = validate_router(router, known_capsules, style_ids)
@@ -297,7 +413,7 @@ def route_request(request: dict[str, Any]) -> dict[str, Any]:
         "request_sha256": request_sha,
         "configuration_sha256": config_sha,
         "implementation_sha256": implementation_sha,
-        "boundaries": DECISION_BOUNDARIES,
+        "boundaries": list(DECISION_BOUNDARIES),
     }
     return {**base, "decision_sha256": digest_bytes(canonical_bytes(base))}
 
