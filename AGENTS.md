@@ -1,34 +1,23 @@
 # AGENTS.md — QSOL-THOTH
 
-QSOL-THOTH is a public routing protocol. Treat its public/private boundary as a hard invariant.
+QSOL-THOTH is a public routing and reconstruction protocol. Treat its public/private and authority boundaries as hard invariants.
 
 ## Required behavior
 
-- Read `README4AI.md` before modifying routing semantics.
-- Validate with `python3 tools/thoth.py validate`.
-- Replay frozen vectors with `python3 tools/thoth.py conformance`.
+- Read `README4AI.md` before modifying routing or reconstruction semantics.
+- Run `python3 tools/thoth.py validate` and `python3 tools/thoth.py conformance`.
 - Run `python3 -m unittest discover -s tests -v` after implementation changes.
-- Keep canonical routing deterministic, network-free, clock-free, and random-free.
-- Use exact declared intent/style tokens only.
-- Fail closed on ambiguity or unknown canonical ids.
-- Version semantic changes rather than silently changing the meaning of an existing CONCAP id.
-- Treat any changed known-answer receipt as a review event; never refresh it just to make CI green.
-- Keep route selection, style selection, evidence admission, and factual authority as separate concepts.
+- For history changes, run plan → pack → reconstruct on `examples/history/world-history-scaffold.json` twice and compare bytes.
+- Keep canonical work network-free, clock-free, and random-free.
+- Fail closed on ambiguity, unknown ids, unsatisfied retention obligations, dependency cycles, or deterministic search-budget exhaustion.
+- Treat changed known-answer receipts and frozen history metrics as review events.
+- Version semantic role changes rather than redefining an existing CONCAP id.
+- Keep routing, style, evidence, historical coverage, and factual authority separate.
 - Open PRs intended for Codex review marked Ready for review, not draft.
 
 ## Forbidden behavior
 
-Do not:
-
-- commit real private capsule bytes;
-- commit secrets, credentials, provider-private state, or hidden reasoning;
-- make THOTH query private QSOL-CAPSULES state as part of canonical public routing;
-- use embeddings, fuzzy semantic matching, nondeterministic model classification, network results, random state, or wall-clock state as canonical route inputs;
-- let receiver style promote a claim's epistemic class;
-- treat deliberate fiction or comedy as biographical evidence;
-- redefine an existing versioned CONCAP id in place;
-- silently substitute `/2` when a route declares `/1`;
-- auto-accept conformance drift.
+Do not commit private capsule bytes, secrets, provider-private state, hidden reasoning, or private context records. Do not use fuzzy/model inference as a canonical router input. Do not silently substitute role versions. Do not treat historical compression as permission to discard information outside explicitly declared retention obligations. Do not claim semantic reconstruction is verbatim recovery or historical evidence.
 
 ## Boundary contract
 
@@ -40,7 +29,8 @@ STYLE_SUPPORT != EVIDENCE
 ROUTE_DECISION != CAPSULE_AVAILABILITY
 NEW_ROLE_VERSION != BACKWARD_COMPATIBLE_BY_DEFAULT
 CONFORMANCE_PASS != FACTUAL_TRUTH
+MINIMUM_SUFFICIENT != COMPLETE_HISTORY
+SEMANTIC_RECONSTRUCTION != VERBATIM_SOURCE
+COVERED_CLAIM != PROVEN_TRUE
 CODEX_REVIEW_REQUESTED => PR_DRAFT == FALSE
 ```
-
-If a proposed change violates one of these boundaries, stop and redesign the change rather than weakening the invariant.

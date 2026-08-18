@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.invalid/schemas/thoth-history-basis-v1.json",
+  "title": "QSOL-THOTH Self-Contained Historical Reconstruction Basis",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol", "dataset_id", "dataset_sha256", "policy_sha256", "plan_sha256", "retention_obligations", "records", "boundaries", "basis_sha256"],
+  "properties": {
+    "protocol": {"const": "QSOL-THOTH/HISTORY-BASIS/1"},
+    "dataset_id": {"type": "string", "pattern": "^[a-z0-9_.-]+$"},
+    "dataset_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "policy_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "plan_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "retention_obligations": {"type":"array","minItems":1,"uniqueItems":true,"items":{"type":"string","pattern":"^[a-z0-9_.-]+$"}},
+    "records": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "order", "kind", "summary", "claims", "requires"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9_.-]+$"},
+          "order": {"type": "integer", "minimum": 1},
+          "kind": {"enum": ["detail", "bridge", "anchor"]},
+          "summary": {"type": "string", "minLength": 1},
+          "claims": {"type":"array","minItems":1,"uniqueItems":true,"items":{"type":"string","pattern":"^[a-z0-9_.-]+$"}},
+          "requires": {"type":"array","uniqueItems":true,"items":{"type":"string","pattern":"^[a-z0-9_.-]+$"}}
+        }
+      }
+    },
+    "boundaries": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "basis_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

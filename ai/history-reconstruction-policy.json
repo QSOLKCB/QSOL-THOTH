@@ -1,0 +1,19 @@
+{
+  "protocol": "QSOL-THOTH/HISTORY-RECONSTRUCTION-POLICY/1",
+  "schema_version": "1.0.0",
+  "objective": {
+    "coverage": "all_retention_obligations",
+    "cost": "canonical_record_bytes",
+    "dependencies": "transitive_closure",
+    "algorithm": "exact_branch_and_bound"
+  },
+  "max_search_nodes": 250000,
+  "tie_break": "total_bytes_then_record_count_then_utf8_ids",
+  "boundaries": [
+    "MINIMUM_SUFFICIENT != COMPLETE_HISTORY",
+    "SEMANTIC_RECONSTRUCTION != VERBATIM_SOURCE",
+    "COVERED_CLAIM != PROVEN_TRUE",
+    "HISTORICAL_SUMMARY != PRIMARY_EVIDENCE",
+    "COMPRESSION != OMISSION_AUTHORITY"
+  ]
+}
