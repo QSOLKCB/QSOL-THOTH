@@ -53,7 +53,7 @@ class PortableConcapSchemaTests(unittest.TestCase):
         self.assertEqual(schema["properties"]["boundaries"]["minItems"], len(resolver.RECEIPT_BOUNDARIES))
         self.assertEqual(schema["properties"]["boundaries"]["maxItems"], len(resolver.RECEIPT_BOUNDARIES))
 
-    def test_runtime_rejects_schema-relevant_contract_drift(self):
+    def test_runtime_rejects_schema_relevant_contract_drift(self):
         altered = copy.deepcopy(self.bindings)
         altered["boundaries"].append("PRIVATE_PATH=/srv/secret/repo")
         with self.assertRaisesRegex(resolver.ResolverError, "E_RESOLVE_BOUNDARIES"):
