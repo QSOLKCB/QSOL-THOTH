@@ -1,0 +1,44 @@
+{
+  "protocol": "QSOL-THOTH/HISTORY-DATASET/1",
+  "schema_version": "1.0.0",
+  "id": "world_history_scaffold",
+  "authority": "demonstration-only",
+  "retention_obligations": [
+    "universe_origin",
+    "earth_origin",
+    "life_emerges",
+    "humans_emerge",
+    "agriculture_spreads",
+    "states_and_writing",
+    "transregional_exchange",
+    "industrialization",
+    "global_conflict",
+    "digital_networked_era"
+  ],
+  "records": [
+    {"id":"cosmic_anchor","order":10,"kind":"anchor","summary":"Cosmic formation is followed much later by Earth, establishing the physical setting for later history.","claims":["universe_origin","earth_origin"],"requires":[]},
+    {"id":"universe_detail","order":20,"kind":"detail","summary":"A cosmic beginning precedes the later historical sequence.","claims":["universe_origin"],"requires":[]},
+    {"id":"earth_detail","order":30,"kind":"detail","summary":"Earth forms within the already existing cosmic setting.","claims":["earth_origin"],"requires":["universe_detail"]},
+    {"id":"biological_anchor","order":40,"kind":"anchor","summary":"Life emerges and, much later in biological history, humans emerge.","claims":["life_emerges","humans_emerge"],"requires":["cosmic_anchor"]},
+    {"id":"life_detail","order":50,"kind":"detail","summary":"Life appears on Earth.","claims":["life_emerges"],"requires":["earth_detail"]},
+    {"id":"human_detail","order":60,"kind":"detail","summary":"Humans appear within the longer biological sequence.","claims":["humans_emerge"],"requires":["life_detail"]},
+    {"id":"civilization_anchor","order":70,"kind":"anchor","summary":"Agriculture supports settled societies; states and writing create durable institutions and records.","claims":["agriculture_spreads","states_and_writing"],"requires":["biological_anchor"]},
+    {"id":"agriculture_detail","order":80,"kind":"detail","summary":"Agriculture spreads and supports settled communities.","claims":["agriculture_spreads"],"requires":["human_detail"]},
+    {"id":"states_detail","order":90,"kind":"detail","summary":"States and writing create durable political and documentary systems.","claims":["states_and_writing"],"requires":["agriculture_detail"]},
+    {"id":"exchange_anchor","order":100,"kind":"bridge","summary":"Long-distance exchange increasingly connects regional histories.","claims":["transregional_exchange"],"requires":["civilization_anchor"]},
+    {"id":"exchange_detail","order":110,"kind":"detail","summary":"Regional histories become increasingly connected by long-distance exchange.","claims":["transregional_exchange"],"requires":["states_detail"]},
+    {"id":"industrial_anchor","order":120,"kind":"anchor","summary":"Industrialization expands production, transport, energy use, and communication at large scale.","claims":["industrialization"],"requires":["exchange_anchor"]},
+    {"id":"industrial_detail","order":130,"kind":"detail","summary":"Industrial production and transport transform economic and political systems.","claims":["industrialization"],"requires":["exchange_detail"]},
+    {"id":"conflict_anchor","order":140,"kind":"anchor","summary":"Industrialized global systems feed major twentieth-century conflicts and political reordering.","claims":["global_conflict"],"requires":["industrial_anchor"]},
+    {"id":"conflict_detail","order":150,"kind":"detail","summary":"Twentieth-century global conflicts reshape states, borders, institutions, and international order.","claims":["global_conflict"],"requires":["industrial_detail"]},
+    {"id":"digital_anchor","order":160,"kind":"anchor","summary":"Electronic computation and networks create a globally connected digital information era.","claims":["digital_networked_era"],"requires":["conflict_anchor"]},
+    {"id":"digital_detail","order":170,"kind":"detail","summary":"Digital networks become a major infrastructure for information exchange.","claims":["digital_networked_era"],"requires":["conflict_detail"]}
+  ],
+  "boundaries": [
+    "MINIMUM_SUFFICIENT != COMPLETE_HISTORY",
+    "SEMANTIC_RECONSTRUCTION != VERBATIM_SOURCE",
+    "COVERED_CLAIM != PROVEN_TRUE",
+    "HISTORICAL_SUMMARY != PRIMARY_EVIDENCE",
+    "COMPRESSION != OMISSION_AUTHORITY"
+  ]
+}
