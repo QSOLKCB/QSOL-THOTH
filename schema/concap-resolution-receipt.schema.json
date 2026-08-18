@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.invalid/schemas/thoth-concap-resolution-receipt-v1.json",
+  "title": "QSOL-THOTH CONCAP Resolution Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol",
+    "route_decision_sha256",
+    "binding_configuration_sha256",
+    "object_index_id",
+    "resolved_roles",
+    "objects_to_fetch",
+    "missing_best_effort",
+    "boundaries",
+    "resolution_sha256"
+  ],
+  "properties": {
+    "protocol": {
+      "const": "QSOL-THOTH/RESOLUTION-RECEIPT/1"
+    },
+    "route_decision_sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "binding_configuration_sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "object_index_id": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "resolved_roles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "role_id",
+          "object_id"
+        ],
+        "properties": {
+          "role_id": {
+            "type": "string",
+            "pattern": "^concap\\.[a-z0-9_.-]+/[1-9][0-9]*$"
+          },
+          "object_id": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "objects_to_fetch": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "object_id",
+          "size_bytes",
+          "media_type",
+          "container",
+          "path"
+        ],
+        "properties": {
+          "object_id": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "media_type": {
+            "const": "application/vnd.qsol.restore-dat"
+          },
+          "container": {
+            "const": "qsol-restore-dat/1"
+          },
+          "path": {
+            "type": "string",
+            "pattern": "^objects/sha256/[0-9a-f]{2}/[0-9a-f]{64}\\.dat$"
+          }
+        }
+      }
+    },
+    "missing_best_effort": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^concap\\.[a-z0-9_.-]+/[1-9][0-9]*$"
+      }
+    },
+    "boundaries": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "resolution_sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  }
+}
