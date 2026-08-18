@@ -2,69 +2,58 @@
 
 ## Phase 0 — Public deterministic router
 
-- [x] Define CONCAP as `CONtext CAPsules`.
-- [x] Separate semantic role ids from concrete private capsule instances.
-- [x] Add public CONCAP registry.
-- [x] Add finite ESS-style receiver state machine.
-- [x] Add exact-token deterministic intent router.
-- [x] Fail closed on unknown intent and style ids.
-- [x] Add canonical route-decision SHA-256 receipts.
-- [x] Bind decisions to request, public configuration, and implementation bytes.
-- [x] Add standard-library validator/router CLI.
-- [x] Add regression tests and CI determinism checks.
-- [x] Enforce `CODEX_REVIEW_REQUESTED => PR_DRAFT == FALSE` in PR CI.
-- [x] Preserve `STYLE_SWITCH != EPISTEMIC_SWITCH`.
+- [x] Define CONCAP as `CONtext CAPsules` and separate semantic roles from private instances.
+- [x] Add registry, ESS style state machine, exact-token router, SHA-256 decision receipts, stdlib CLI, tests, CI, and Ready-for-review invariant.
 
 ## Phase 1 — Public CONCAP contract hardening
 
-- [x] Add machine-readable role schema for `ai/concap-registry.json`.
-- [x] Add machine-readable ESS state-machine schema.
-- [x] Add machine-readable router schema.
-- [x] Add canonical known-answer route vectors with frozen expected receipts.
-- [x] Add negative vectors for ambiguous aliases, duplicate ids, duplicate JSON members, and unknown support CONCAPs.
-- [x] Add stable machine error codes for conformance failures.
-- [x] Add a versioned compatibility policy for CONCAP role evolution.
-- [x] Add `python3 tools/thoth.py conformance` and replay it in CI.
+- [x] Add machine-readable schemas, frozen positive/negative vectors, stable machine errors, role-version compatibility policy, and `thoth.py conformance`.
 
-## Phase 2 — Canonical source bindings
+## Phase 2 — Historical reconstruction bases
+
+- [x] Add `concap.history.timeline/1` and `historical_reconstruction` routing.
+- [x] Define explicit semantic retention obligations.
+- [x] Add deterministic transitive dependency closure.
+- [x] Add exact branch-and-bound minimization by canonical record bytes.
+- [x] Add deterministic search-node budget and fail-closed exhaustion.
+- [x] Add a self-contained `HISTORY-BASIS/1` package that reconstructs without the discarded source dataset.
+- [x] Add plan, basis, and reconstruction SHA-256 receipts.
+- [x] Freeze a demonstration-only world-history scaffold and its minimum result.
+- [x] Keep semantic reconstruction separate from verbatim recovery and factual authority.
+
+## Phase 3 — Canonical source bindings
 
 - [ ] Define a public binding contract from CONCAP role ids to QSOL-CONTEXT pack-spec roles without exposing private source records.
-- [ ] Bind `concap.culture.comedy/1` to the cultural-artifact class that includes authored comedy and related visual/media artifacts.
+- [ ] Bind `concap.culture.comedy/1` to authored comedy and related visual/media artifacts.
 - [ ] Bind `concap.culture.au-humour/1` to receiver-style guidance only.
-- [ ] Prove by validation that cultural receiver support cannot grant fact authority.
+- [ ] Define source-class bindings for `concap.history.timeline/1` without granting evidence authority.
+- [ ] Prove cultural and historical support cannot grant fact authority.
 - [ ] Keep source-selection policy distinct from style-selection policy.
 
-## Phase 3 — QSOL-CONTROL integration
+## Phase 4 — QSOL-CONTROL integration
 
-- [ ] Add a CONTROL adapter that consumes a THOTH route decision and resolves declared CONCAP ids against an explicit private availability map.
-- [ ] Preserve raw source bytes for binary/media entries.
-- [ ] Reject undeclared role-to-instance mappings.
-- [ ] Emit a resolver receipt binding THOTH decision id to exact selected capsule instance ids.
+- [ ] Add a CONTROL adapter consuming a THOTH decision plus explicit private availability map.
+- [ ] Preserve raw binary/media bytes; reject undeclared role-to-instance mappings.
+- [ ] Emit resolver receipts binding THOTH decisions to exact capsule instances.
 - [ ] Keep `ROUTE_DECISION != CAPSULE_AVAILABILITY` explicit.
 
-## Phase 4 — QSOL-CAPSULES integration
+## Phase 5 — QSOL-CAPSULES integration
 
-- [ ] Add private CONCAP instance metadata without exposing payloads publicly.
-- [ ] Support immutable historical instances of the same semantic CONCAP role.
-- [ ] Bind each instance to exact source, generator, policy, and capsule hashes.
+- [ ] Add private CONCAP instance metadata and immutable historical instances.
+- [ ] Bind instances to exact source, generator, policy, and capsule hashes.
 - [ ] Preserve append-only snapshot semantics.
-- [ ] Route `culture.dat` content through CONCAP semantic roles rather than one monolithic style blob.
+- [ ] Route culture/history content through semantic roles rather than monolithic style blobs.
 
-## Phase 5 — QSOL-ARK evaluation
+## Phase 6 — QSOL-ARK evaluation
 
-- [ ] Measure route sufficiency: did the selected CONCAP set contain enough context for the task?
-- [ ] Measure route minimality: was unnecessary private context avoided?
-- [ ] Measure style fidelity separately from factual accuracy.
-- [ ] Add negative-space tests for style leakage into factual claims.
+- [ ] Measure route sufficiency/minimality, style fidelity, factual accuracy, and historical reconstruction coverage separately.
+- [ ] Add negative-space tests for style leakage and unsupported historical interpolation.
 - [ ] Add clean-room tests across multiple consumers.
 - [ ] Keep `STYLE_FIDELITY != FACTUAL_ACCURACY != PHYSICAL_TRUTH` explicit.
 
-## Phase 6 — Multi-turn ESS switching
+## Phase 7 — Multi-turn ESS switching
 
-- [ ] Define deterministic style persistence across a conversation route epoch.
-- [ ] Define explicit transition events rather than model-inferred mood switching.
-- [ ] Add hysteresis/dwell rules only if multi-turn chattering becomes a demonstrated problem.
-- [ ] Make transition receipts replayable from explicit request events.
+- [ ] Define deterministic style persistence, explicit transition events, optional demonstrated hysteresis/dwell rules, and replayable transition receipts.
 
 ## Long-term invariants
 
@@ -76,4 +65,7 @@ STYLE_SWITCH != EPISTEMIC_SWITCH
 STYLE_SUPPORT != EVIDENCE
 SELECTED != LOADED
 LOADED != TRUE
+MINIMUM_SUFFICIENT != COMPLETE_HISTORY
+SEMANTIC_RECONSTRUCTION != VERBATIM_SOURCE
+COVERED_CLAIM != PROVEN_TRUE
 ```
