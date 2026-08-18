@@ -224,6 +224,11 @@ def validate_decision_schema(schema: dict[str, Any]) -> None:
         prop = properties[field]
         require(isinstance(prop, dict) and prop.get("type") == "array", "E_SCHEMA_SEMANTICS", f"{where}.{field}: type must be array")
         require(prop.get("uniqueItems") is True, "E_SCHEMA_SEMANTICS", f"{where}.{field}: uniqueItems must be true")
+        require(
+            prop.get("items") == {"type":"string", "minLength":1},
+            "E_SCHEMA_SEMANTICS",
+            f"{where}.{field}: items must be non-empty strings",
+        )
 
 
 def validate_registry_schema(schema: dict[str, Any]) -> None:
@@ -601,6 +606,15 @@ def exercise_negative_vector(vector: dict[str, Any]) -> str:
     params = vector["parameters"]
     require(isinstance(params, dict), "E_VECTOR_SHAPE", "negative vector parameters must be object")
 
+    raw_fixture: Path | None = None
+    if case == "raw_request_file":
+        exact_keys(params, {"fixture"}, f"negative vector {vector.get('id','?')} parameters", "E_VECTOR_SHAPE")
+        fixture_name = params.get("fixture")
+        require(isinstance(fixture_name, str) and fixture_name, "E_VECTOR_SHAPE", "raw_request_file fixture must be a non-empty string")
+        fixture_rel = Path(fixture_name)
+        require(not fixture_rel.is_absolute() and ".." not in fixture_rel.parts, "E_VECTOR_SHAPE", "raw_request_file fixture must be repository-relative")
+        raw_fixture = ROOT / fixture_rel
+
     registry = load_json(REGISTRY_PATH)
     style_machine = load_json(STYLE_PATH)
     router = load_json(ROUTER_PATH)
@@ -618,7 +632,8 @@ def exercise_negative_vector(vector: dict[str, Any]) -> str:
             _, known = validate_registry(registry)
             styles_known = validate_style_machine(style_machine, known)
             router = copy.deepcopy(router)
-            router["routes"][1]["aliases"].append(router["routes"][0]["intent"])
+            first_route = router["routes"][0]
+            first_route["aliases"].append(first_route["intent"])
             validate_router(router, known, styles_known)
         elif case == "style_unknown_support_concap":
             _, known = validate_registry(registry)
@@ -630,8 +645,8 @@ def exercise_negative_vector(vector: dict[str, Any]) -> str:
         elif case == "request_unknown_style":
             route_request({"protocol":"QSOL-THOTH/ROUTE-REQUEST/1","intent":"general","style":params.get("style","missing_style")})
         elif case == "raw_request_file":
-            fixture = ROOT / params["fixture"]
-            load_json(fixture)
+            require(raw_fixture is not None, "E_VECTOR_SHAPE", "raw_request_file fixture was not prepared")
+            load_json(raw_fixture)
         else:
             fail("E_VECTOR_CASE", f"unsupported negative vector case: {case}")
     except ThothError as exc:
