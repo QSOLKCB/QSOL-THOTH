@@ -1,0 +1,87 @@
+{
+  "protocol": "QSOL-THOTH/CONCAP-SOURCE-BINDINGS/1",
+  "schema_version": "1.0.0",
+  "authority": "resolution-metadata-only",
+  "roles": [
+    {
+      "role_id": "concap.culture.au-humour/1",
+      "source_class": "receiver_style.australian_humour",
+      "load_requirement": "best_effort",
+      "delivery": "portable_object",
+      "style_support_only": true,
+      "factual_authority": "none-by-resolution"
+    },
+    {
+      "role_id": "concap.culture.comedy/1",
+      "source_class": "authored_comedy",
+      "load_requirement": "best_effort",
+      "delivery": "portable_object",
+      "style_support_only": true,
+      "factual_authority": "none-by-resolution"
+    },
+    {
+      "role_id": "concap.culture.core/1",
+      "source_class": "cultural_context",
+      "load_requirement": "best_effort",
+      "delivery": "portable_object",
+      "style_support_only": true,
+      "factual_authority": "none-by-resolution"
+    },
+    {
+      "role_id": "concap.culture.music/1",
+      "source_class": "music_sonification_context",
+      "load_requirement": "best_effort",
+      "delivery": "portable_object",
+      "style_support_only": true,
+      "factual_authority": "none-by-resolution"
+    },
+    {
+      "role_id": "concap.history.timeline/1",
+      "source_class": "historical_reconstruction_basis",
+      "load_requirement": "required",
+      "delivery": "portable_object",
+      "style_support_only": false,
+      "factual_authority": "none-by-resolution"
+    },
+    {
+      "role_id": "concap.identity.core/1",
+      "source_class": "canonical_identity_context",
+      "load_requirement": "required",
+      "delivery": "portable_object",
+      "style_support_only": false,
+      "factual_authority": "none-by-resolution"
+    },
+    {
+      "role_id": "concap.receipts/1",
+      "source_class": "provenance_receipts",
+      "load_requirement": "required",
+      "delivery": "portable_object",
+      "style_support_only": false,
+      "factual_authority": "none-by-resolution"
+    },
+    {
+      "role_id": "concap.research.active/1",
+      "source_class": "active_research_context",
+      "load_requirement": "required",
+      "delivery": "portable_object",
+      "style_support_only": false,
+      "factual_authority": "none-by-resolution"
+    },
+    {
+      "role_id": "concap.workstyle.engineering/1",
+      "source_class": "engineering_workstyle",
+      "load_requirement": "required",
+      "delivery": "portable_object",
+      "style_support_only": false,
+      "factual_authority": "none-by-resolution"
+    }
+  ],
+  "boundaries": [
+    "SOURCE_BINDING != PRIVATE_SOURCE_PATH",
+    "RESOLUTION != TRANSPORT",
+    "OBJECT_IDENTITY != TRANSPORT_LOCATION",
+    "RESOLUTION != FACTUAL_AUTHORITY",
+    "MODEL_CAN_LOAD_OBJECT != MODEL_CAN_ACCESS_SOURCE_REPOSITORY",
+    "SELECTED != LOADED"
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.invalid/schemas/concap-object-index-v1.json",
+  "title": "QSOL-CONCAP Portable Object Index",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol", "schema_version", "index_id", "bundle_id", "bundle_class", "export_spec_sha256", "projection_sha256", "objects", "role_bindings", "boundaries"],
+  "properties": {
+    "protocol": {"const": "QSOL-CONCAP/OBJECT-INDEX/1"},
+    "schema_version": {"const": "1.0.0"},
+    "index_id": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "bundle_id": {"type": "string", "pattern": "^[a-z0-9_.-]+$"},
+    "bundle_class": {"enum": ["PUBLIC", "INTERNAL", "RESTRICTED"]},
+    "export_spec_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "projection_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "objects": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["object_id", "size_bytes", "media_type", "container", "path"],
+        "properties": {
+          "object_id": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+          "size_bytes": {"type": "integer", "minimum": 0},
+          "media_type": {"const": "application/vnd.qsol.restore-dat"},
+          "container": {"const": "qsol-restore-dat/1"},
+          "path": {"type": "string", "pattern": "^objects/sha256/[0-9a-f]{2}/[0-9a-f]{64}\\.dat$"}
+        }
+      }
+    },
+    "role_bindings": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role_id", "object_id"],
+        "properties": {
+          "role_id": {"type": "string", "pattern": "^concap\\.[a-z0-9_.-]+/[1-9][0-9]*$"},
+          "object_id": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "boundaries": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "prefixItems": [
+        {"const": "PRIVATE_SOURCE != PORTABLE_BUNDLE"},
+        {"const": "BUNDLE_OBJECT != CANONICAL_SOURCE"},
+        {"const": "OBJECT_IDENTITY != TRANSPORT_LOCATION"},
+        {"const": "MODEL_CAN_LOAD_OBJECT != MODEL_CAN_ACCESS_SOURCE_REPOSITORY"},
+        {"const": "QSOL-RESTORE-DAT/1 != ENCRYPTION"}
+      ],
+      "items": false
+    }
+  }
+}

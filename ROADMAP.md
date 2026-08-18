@@ -21,34 +21,42 @@
 - [x] Freeze a demonstration-only world-history scaffold and its minimum result.
 - [x] Keep semantic reconstruction separate from verbatim recovery and factual authority.
 
-## Phase 3 — Canonical source bindings
+## Phase 3 — Canonical source-class bindings
 
-- [ ] Define a public binding contract from CONCAP role ids to QSOL-CONTEXT pack-spec roles without exposing private source records.
-- [ ] Bind `concap.culture.comedy/1` to authored comedy and related visual/media artifacts.
-- [ ] Bind `concap.culture.au-humour/1` to receiver-style guidance only.
-- [ ] Define source-class bindings for `concap.history.timeline/1` without granting evidence authority.
-- [ ] Prove cultural and historical support cannot grant fact authority.
-- [ ] Keep source-selection policy distinct from style-selection policy.
+- [x] Define public semantic source-class bindings without exposing private repositories, commits, or source paths.
+- [x] Bind `concap.culture.comedy/1` to the `authored_comedy` source class.
+- [x] Bind `concap.culture.au-humour/1` to receiver-style support only.
+- [x] Bind `concap.history.timeline/1` to a historical-reconstruction-basis source class without granting evidence authority.
+- [x] Mark style-only source classes `best_effort`; keep data/recovery roles fail-closed when unavailable.
+- [x] Keep source-class policy distinct from route, style, object availability, transport, and factual authority.
 
-## Phase 4 — QSOL-CONTROL integration
+## Phase 4 — Portable CONCAP delivery
 
-- [ ] Add a CONTROL adapter consuming a THOTH decision plus explicit private availability map.
-- [ ] Preserve raw binary/media bytes; reject undeclared role-to-instance mappings.
-- [ ] Emit resolver receipts binding THOTH decisions to exact capsule instances.
-- [ ] Keep `ROUTE_DECISION != CAPSULE_AVAILABILITY` explicit.
+- [x] Define `QSOL-CONCAP/OBJECT-INDEX/1` for explicit role -> immutable object resolution.
+- [x] Define `QSOL-CONCAP/BOOTSTRAP/1` as a small transport-neutral bundle entry document.
+- [x] Define `QSOL-THOTH/RESOLUTION-RECEIPT/1` with acyclic SHA-256 identity.
+- [x] Add a network-free resolver consuming a THOTH decision plus an explicit object index.
+- [x] De-duplicate objects when one immutable object satisfies several roles.
+- [x] Fail closed on missing required roles while reporting missing best-effort style support.
+- [x] Keep object identity content-addressed and transport location outside canonical identity.
+- [x] Coordinate QSOL-CONTROL deterministic portable-bundle export over existing `QSOL-RESTORE-DAT/1` objects.
+- [x] Coordinate QSOL-CONTEXT explicit private export policy and QSOL-CAPSULES private role-instance map.
+- [x] Preserve `MODEL_CAN_RECONSTRUCT_CONTEXT != MODEL_CAN_ACCESS_PRIVATE_SOURCE`.
 
-## Phase 5 — QSOL-CAPSULES integration
+## Phase 5 — QSOL-CAPSULES instance history
 
-- [ ] Add private CONCAP instance metadata and immutable historical instances.
-- [ ] Bind instances to exact source, generator, policy, and capsule hashes.
+- [x] Define private role-to-capsule instance metadata without exposing payloads publicly.
+- [ ] Populate real accepted snapshots after capsule generation and fixed-point verification.
+- [ ] Support immutable historical instances of the same semantic CONCAP role across snapshots.
+- [ ] Bind accepted instances to exact source, generator, policy, and capsule hashes.
 - [ ] Preserve append-only snapshot semantics.
-- [ ] Route culture/history content through semantic roles rather than monolithic style blobs.
 
 ## Phase 6 — QSOL-ARK evaluation
 
 - [ ] Measure route sufficiency/minimality, style fidelity, factual accuracy, and historical reconstruction coverage separately.
-- [ ] Add negative-space tests for style leakage and unsupported historical interpolation.
-- [ ] Add clean-room tests across multiple consumers.
+- [ ] Add clean-room tests where consumers receive only a portable bundle, never source-repository access.
+- [ ] Compare local-directory, archive, static-HTTP, and capability-relay transports for byte-identical resolved objects.
+- [ ] Add negative-space tests for style leakage, unsupported historical interpolation, and accidental private-source dependency.
 - [ ] Keep `STYLE_FIDELITY != FACTUAL_ACCURACY != PHYSICAL_TRUTH` explicit.
 
 ## Phase 7 — Multi-turn ESS switching
@@ -68,4 +76,10 @@ LOADED != TRUE
 MINIMUM_SUFFICIENT != COMPLETE_HISTORY
 SEMANTIC_RECONSTRUCTION != VERBATIM_SOURCE
 COVERED_CLAIM != PROVEN_TRUE
+SOURCE_BINDING != PRIVATE_SOURCE_PATH
+ROUTING != RESOLUTION
+RESOLUTION != TRANSPORT
+TRANSPORT != AUTHORITY
+OBJECT_IDENTITY != TRANSPORT_LOCATION
+MODEL_CAN_RECONSTRUCT_CONTEXT != MODEL_CAN_ACCESS_PRIVATE_SOURCE
 ```

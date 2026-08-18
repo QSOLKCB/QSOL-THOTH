@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.invalid/schemas/concap-bootstrap-v1.json",
+  "title": "QSOL-CONCAP Portable Bootstrap",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol",
+    "schema_version",
+    "bundle_id",
+    "bundle_class",
+    "object_index_path",
+    "object_index_id",
+    "object_index_sha256",
+    "object_count",
+    "role_count",
+    "boundaries"
+  ],
+  "properties": {
+    "protocol": {
+      "const": "QSOL-CONCAP/BOOTSTRAP/1"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "bundle_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_.-]+$"
+    },
+    "bundle_class": {
+      "enum": [
+        "PUBLIC",
+        "INTERNAL",
+        "RESTRICTED"
+      ]
+    },
+    "object_index_path": {
+      "const": "OBJECTS.json"
+    },
+    "object_index_id": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "object_index_sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "object_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "role_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "boundaries": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}
