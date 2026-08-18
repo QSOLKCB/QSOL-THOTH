@@ -7,6 +7,12 @@
 ```bash
 python3 tools/thoth.py validate
 python3 tools/thoth.py conformance
+python3 tools/concap_resolver.py validate-bindings
+python3 tools/instance_history.py validate --history examples/instances/synthetic-instance-history.json
+python3 tools/ark_evaluation.py validate-policy
+python3 tools/ark_evaluation.py evaluate --observation examples/evaluation/synthetic-clean-room-observation.json
+python3 tools/ess_session.py validate-policy
+python3 tools/ess_session.py replay --session examples/ess/demonstrated-hysteresis.session.json
 python3 -m unittest discover -s tests -v
 ```
 
@@ -63,6 +69,13 @@ schema/ess-style-machine.schema.json
 schema/router.schema.json
 schema/route-request.schema.json
 schema/route-decision.schema.json
+schema/concap-instance-history.schema.json
+schema/ark-evaluation-policy.schema.json
+schema/ark-evaluation-observation.schema.json
+schema/ark-evaluation-receipt.schema.json
+schema/ess-session-policy.schema.json
+schema/ess-session.schema.json
+schema/ess-session-replay.schema.json
 ```
 
 `tools/thoth.py validate` both checks the schema contracts themselves and validates the current configuration instances against the schema subset THOTH uses.
@@ -81,6 +94,26 @@ COMPATIBILITY_DECLARATION != AUTOMATIC_SUBSTITUTION
 ```
 
 A resolver must match the exact CONCAP role id declared by the route decision. `/2` is not an automatic substitute for `/1`.
+
+## Late-phase conformance
+
+The instance-history, ARK-evaluation, and ESS-session tools are separate from the frozen one-turn router implementation. They add their own acyclic receipts and stable failures without refreshing routing vectors.
+
+The public conformance fixtures prove:
+
+- multiple immutable instances of one role can survive across an append-only snapshot chain;
+- synthetic metadata remains explicitly distinct from executed private snapshots;
+- route sufficiency/minimality, style, fact, and history metrics remain separate;
+- clean-room transport observations are byte-identical across the four declared profiles;
+- negative-space violations fail closed;
+- persisted style rebuilds effective route decisions with the correct support roles;
+- hysteresis, routed-event dwell, reset, and receipt chaining replay byte-for-byte.
+
+```text
+SYNTHETIC_CONFORMANCE != CLAIMED_EXECUTION
+AGGREGATE_SCORE = FORBIDDEN
+REPLAY_RECEIPT != HIDDEN_STATE
+```
 
 ## Scope boundary
 

@@ -47,6 +47,44 @@ jobs:
           python3 -m json.tool schema/concap-resolution-receipt.schema.json >/dev/null
           python3 -m unittest tests.test_concap_schema -v
 
+      - name: Validate immutable instance-history conformance
+        run: |
+          python3 tools/instance_history.py validate --history examples/instances/synthetic-instance-history.json
+          python3 tools/instance_history.py check-append-only \
+            --base examples/instances/synthetic-instance-history.json \
+            --candidate examples/instances/synthetic-instance-history.json
+          python3 -m json.tool schema/concap-instance-history.schema.json >/dev/null
+
+      - name: Validate QSOL-ARK evaluation conformance
+        run: |
+          python3 tools/ark_evaluation.py validate-policy
+          python3 tools/ark_evaluation.py evaluate \
+            --observation examples/evaluation/synthetic-clean-room-observation.json \
+            > /tmp/ark-evaluation-a.json
+          python3 tools/ark_evaluation.py evaluate \
+            --observation examples/evaluation/synthetic-clean-room-observation.json \
+            > /tmp/ark-evaluation-b.json
+          cmp /tmp/ark-evaluation-a.json /tmp/ark-evaluation-b.json
+          python3 -m json.tool ai/ark-evaluation-policy.json >/dev/null
+          python3 -m json.tool schema/ark-evaluation-policy.schema.json >/dev/null
+          python3 -m json.tool schema/ark-evaluation-observation.schema.json >/dev/null
+          python3 -m json.tool schema/ark-evaluation-receipt.schema.json >/dev/null
+
+      - name: Validate multi-turn ESS replay
+        run: |
+          python3 tools/ess_session.py validate-policy
+          python3 tools/ess_session.py replay \
+            --session examples/ess/demonstrated-hysteresis.session.json \
+            > /tmp/ess-replay-a.json
+          python3 tools/ess_session.py replay \
+            --session examples/ess/demonstrated-hysteresis.session.json \
+            > /tmp/ess-replay-b.json
+          cmp /tmp/ess-replay-a.json /tmp/ess-replay-b.json
+          python3 -m json.tool ai/ess-session-policy.json >/dev/null
+          python3 -m json.tool schema/ess-session-policy.schema.json >/dev/null
+          python3 -m json.tool schema/ess-session.schema.json >/dev/null
+          python3 -m json.tool schema/ess-session-replay.schema.json >/dev/null
+
       - name: Run unit tests
         run: python3 -m unittest discover -s tests -v
 

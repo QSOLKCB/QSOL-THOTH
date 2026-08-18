@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.invalid/schemas/thoth-ess-session-policy-v1.json",
+  "title": "QSOL-THOTH ESS Session Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol",
+    "schema_version",
+    "authority",
+    "initialization",
+    "persistence",
+    "profiles",
+    "reset",
+    "canonical_inputs",
+    "boundaries"
+  ],
+  "properties": {
+    "protocol": {"const": "QSOL-THOTH/ESS-SESSION-POLICY/1"},
+    "schema_version": {"const": "1.0.0"},
+    "authority": {"const": "receiver-style-only"},
+    "initialization": {"const": "first-route-default-or-explicit-transition"},
+    "persistence": {"const": "current-style-persists-until-explicit-transition-or-reset"},
+    "profiles": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {"$ref": "#/$defs/profile"}
+    },
+    "reset": {"const": "clear-style-next-route-reinitializes"},
+    "canonical_inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model_inferred_transitions", "wall_clock_input", "random_input", "network_input"],
+      "properties": {
+        "model_inferred_transitions": {"const": false},
+        "wall_clock_input": {"const": false},
+        "random_input": {"const": false},
+        "network_input": {"const": false}
+      }
+    },
+    "boundaries": {"$ref": "#/$defs/boundaries"}
+  },
+  "$defs": {
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "order", "minimum_dwell_routes", "transition_confirmations"],
+      "properties": {
+        "id": {"enum": ["immediate", "demonstrated_hysteresis"]},
+        "order": {"type": "integer", "minimum": 1},
+        "minimum_dwell_routes": {"type": "integer", "minimum": 0},
+        "transition_confirmations": {"type": "integer", "minimum": 1}
+      }
+    },
+    "boundaries": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "prefixItems": [
+        {"const": "STYLE_SWITCH != EPISTEMIC_SWITCH"},
+        {"const": "STYLE_PERSISTENCE != EPISTEMIC_PERSISTENCE"},
+        {"const": "EXPLICIT_STYLE_TRANSITION != MODEL_INFERENCE"},
+        {"const": "ROUTE_DEFAULT != FORCED_SESSION_TRANSITION"},
+        {"const": "HYSTERESIS != AMBIGUITY"},
+        {"const": "DWELL_COUNT != WALL_CLOCK_TIME"},
+        {"const": "REPLAY_RECEIPT != HIDDEN_STATE"}
+      ],
+      "items": false
+    }
+  }
+}

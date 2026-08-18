@@ -1,0 +1,175 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.invalid/schemas/thoth-ark-evaluation-receipt-v1.json",
+  "title": "QSOL-ARK THOTH Evaluation Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol",
+    "trial_id",
+    "policy_sha256",
+    "observation_sha256",
+    "metrics",
+    "transport_equivalence",
+    "clean_room_status",
+    "negative_space_status",
+    "aggregation",
+    "boundaries",
+    "evaluation_sha256"
+  ],
+  "properties": {
+    "protocol": {"const": "QSOL-ARK/THOTH-EVALUATION-RECEIPT/1"},
+    "trial_id": {"$ref": "#/$defs/token"},
+    "policy_sha256": {"$ref": "#/$defs/sha256"},
+    "observation_sha256": {"$ref": "#/$defs/sha256"},
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "route_sufficiency",
+        "route_minimality",
+        "style_fidelity",
+        "factual_accuracy",
+        "historical_reconstruction_coverage"
+      ],
+      "properties": {
+        "route_sufficiency": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["fraction", "missing_required_roles"],
+          "properties": {
+            "fraction": {"$ref": "#/$defs/fraction"},
+            "missing_required_roles": {"$ref": "#/$defs/roleList"}
+          }
+        },
+        "route_minimality": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["fraction", "unjustified_selected_roles"],
+          "properties": {
+            "fraction": {"$ref": "#/$defs/fraction"},
+            "unjustified_selected_roles": {"$ref": "#/$defs/roleList"}
+          }
+        },
+        "style_fidelity": {"$ref": "#/$defs/styleOutcomeMetric"},
+        "factual_accuracy": {"$ref": "#/$defs/factualOutcomeMetric"},
+        "historical_reconstruction_coverage": {"$ref": "#/$defs/historicalOutcomeMetric"}
+      }
+    },
+    "transport_equivalence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "profiles", "object_count", "object_set_sha256"],
+      "properties": {
+        "status": {"const": "byte-identical"},
+        "profiles": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "prefixItems": [
+            {"const": "local-directory"},
+            {"const": "archive"},
+            {"const": "static-http"},
+            {"const": "capability-relay"}
+          ],
+          "items": false
+        },
+        "object_count": {"type": "integer", "minimum": 1},
+        "object_set_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "clean_room_status": {"const": "pass"},
+    "negative_space_status": {"const": "pass"},
+    "aggregation": {"const": "none"},
+    "boundaries": {"$ref": "#/$defs/boundaries"},
+    "evaluation_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "token": {"type": "string", "pattern": "^[a-z0-9_.-]+$"},
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "role": {"type": "string", "pattern": "^concap\\.[a-z0-9_.-]+/[1-9][0-9]*$"},
+    "roleList": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/role"}
+    },
+    "fraction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["numerator", "denominator"],
+      "properties": {
+        "numerator": {"type": "integer", "minimum": 0},
+        "denominator": {"type": "integer", "minimum": 1}
+      }
+    },
+    "styleOutcomeMetric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fraction", "counts"],
+      "properties": {
+        "fraction": {"$ref": "#/$defs/fraction"},
+        "counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["pass", "fail", "not_observed"],
+          "properties": {
+            "pass": {"type": "integer", "minimum": 0},
+            "fail": {"type": "integer", "minimum": 0},
+            "not_observed": {"type": "integer", "minimum": 0}
+          }
+        }
+      }
+    },
+    "factualOutcomeMetric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fraction", "counts"],
+      "properties": {
+        "fraction": {"$ref": "#/$defs/fraction"},
+        "counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["correct", "incorrect", "unverified"],
+          "properties": {
+            "correct": {"type": "integer", "minimum": 0},
+            "incorrect": {"type": "integer", "minimum": 0},
+            "unverified": {"type": "integer", "minimum": 0}
+          }
+        }
+      }
+    },
+    "historicalOutcomeMetric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fraction", "counts"],
+      "properties": {
+        "fraction": {"$ref": "#/$defs/fraction"},
+        "counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["covered", "missed", "unverified"],
+          "properties": {
+            "covered": {"type": "integer", "minimum": 0},
+            "missed": {"type": "integer", "minimum": 0},
+            "unverified": {"type": "integer", "minimum": 0}
+          }
+        }
+      }
+    },
+    "boundaries": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "prefixItems": [
+        {"const": "STYLE_FIDELITY != FACTUAL_ACCURACY != PHYSICAL_TRUTH"},
+        {"const": "ROUTE_SUFFICIENCY != ROUTE_MINIMALITY"},
+        {"const": "HISTORICAL_COVERAGE != HISTORICAL_TRUTH"},
+        {"const": "TRANSPORT_EQUIVALENCE != AUTHORITY"},
+        {"const": "CLEAN_ROOM_SUCCESS != PRIVATE_SOURCE_ACCESS"},
+        {"const": "MEASURED_OBSERVATION != AUTOMATIC_TRUTH"},
+        {"const": "AGGREGATE_SCORE = FORBIDDEN"}
+      ],
+      "items": false
+    }
+  }
+}

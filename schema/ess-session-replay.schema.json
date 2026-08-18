@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.invalid/schemas/thoth-ess-session-replay-v1.json",
+  "title": "QSOL-THOTH ESS Session Replay",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol",
+    "session_id",
+    "profile_id",
+    "policy_sha256",
+    "session_sha256",
+    "receipts",
+    "final_style",
+    "final_receipt_sha256",
+    "boundaries",
+    "replay_sha256"
+  ],
+  "properties": {
+    "protocol": {"const": "QSOL-THOTH/ESS-SESSION-REPLAY/1"},
+    "session_id": {"$ref": "#/$defs/token"},
+    "profile_id": {"enum": ["immediate", "demonstrated_hysteresis"]},
+    "policy_sha256": {"$ref": "#/$defs/sha256"},
+    "session_sha256": {"$ref": "#/$defs/sha256"},
+    "receipts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/eventReceipt"}
+    },
+    "final_style": {"$ref": "#/$defs/styleOrNull"},
+    "final_receipt_sha256": {"$ref": "#/$defs/sha256"},
+    "boundaries": {"$ref": "#/$defs/boundaries"},
+    "replay_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "token": {"type": "string", "pattern": "^[a-z0-9_.-]+$"},
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "shaOrNull": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/sha256"}
+      ]
+    },
+    "styleOrNull": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/token"}
+      ]
+    },
+    "concapList": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^concap\\.[a-z0-9_.-]+/[1-9][0-9]*$"
+      }
+    },
+    "pendingTransition": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["target_style", "confirmations"],
+          "properties": {
+            "target_style": {"$ref": "#/$defs/token"},
+            "confirmations": {"type": "integer", "minimum": 1}
+          }
+        }
+      ]
+    },
+    "eventReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol",
+        "session_id",
+        "profile_id",
+        "sequence",
+        "event_id",
+        "event_kind",
+        "event_sha256",
+        "policy_sha256",
+        "previous_receipt_sha256",
+        "before_style",
+        "after_style",
+        "base_route_style",
+        "base_route_decision_sha256",
+        "effective_route_decision_sha256",
+        "effective_concaps",
+        "requested_target_style",
+        "outcome",
+        "dwell_routes_after",
+        "pending_transition",
+        "boundaries",
+        "receipt_sha256"
+      ],
+      "properties": {
+        "protocol": {"const": "QSOL-THOTH/ESS-TRANSITION-RECEIPT/1"},
+        "session_id": {"$ref": "#/$defs/token"},
+        "profile_id": {"enum": ["immediate", "demonstrated_hysteresis"]},
+        "sequence": {"type": "integer", "minimum": 1},
+        "event_id": {"$ref": "#/$defs/token"},
+        "event_kind": {"enum": ["route", "transition", "reset"]},
+        "event_sha256": {"$ref": "#/$defs/sha256"},
+        "policy_sha256": {"$ref": "#/$defs/sha256"},
+        "previous_receipt_sha256": {"$ref": "#/$defs/shaOrNull"},
+        "before_style": {"$ref": "#/$defs/styleOrNull"},
+        "after_style": {"$ref": "#/$defs/styleOrNull"},
+        "base_route_style": {"$ref": "#/$defs/styleOrNull"},
+        "base_route_decision_sha256": {"$ref": "#/$defs/shaOrNull"},
+        "effective_route_decision_sha256": {"$ref": "#/$defs/shaOrNull"},
+        "effective_concaps": {"$ref": "#/$defs/concapList"},
+        "requested_target_style": {"$ref": "#/$defs/styleOrNull"},
+        "outcome": {
+          "enum": [
+            "initialized_from_route_default",
+            "initialized_from_explicit_transition",
+            "persisted",
+            "pending_confirmation",
+            "deferred_by_dwell",
+            "transitioned",
+            "no_op_current_style",
+            "reset"
+          ]
+        },
+        "dwell_routes_after": {"type": "integer", "minimum": 0},
+        "pending_transition": {"$ref": "#/$defs/pendingTransition"},
+        "boundaries": {"$ref": "#/$defs/boundaries"},
+        "receipt_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "boundaries": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "prefixItems": [
+        {"const": "STYLE_SWITCH != EPISTEMIC_SWITCH"},
+        {"const": "STYLE_PERSISTENCE != EPISTEMIC_PERSISTENCE"},
+        {"const": "EXPLICIT_STYLE_TRANSITION != MODEL_INFERENCE"},
+        {"const": "ROUTE_DEFAULT != FORCED_SESSION_TRANSITION"},
+        {"const": "HYSTERESIS != AMBIGUITY"},
+        {"const": "DWELL_COUNT != WALL_CLOCK_TIME"},
+        {"const": "REPLAY_RECEIPT != HIDDEN_STATE"}
+      ],
+      "items": false
+    }
+  }
+}

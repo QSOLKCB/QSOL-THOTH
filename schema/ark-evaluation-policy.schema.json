@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.invalid/schemas/thoth-ark-evaluation-policy-v1.json",
+  "title": "QSOL-THOTH ARK Evaluation Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol",
+    "schema_version",
+    "authority",
+    "dimensions",
+    "transport_profiles",
+    "clean_room_requirements",
+    "negative_space_checks",
+    "aggregation",
+    "boundaries"
+  ],
+  "properties": {
+    "protocol": {"const": "QSOL-THOTH/ARK-EVALUATION-POLICY/1"},
+    "schema_version": {"const": "1.0.0"},
+    "authority": {"const": "measurement-contract-only"},
+    "dimensions": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {"$ref": "#/$defs/dimension"}
+    },
+    "transport_profiles": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "prefixItems": [
+        {"const": "local-directory"},
+        {"const": "archive"},
+        {"const": "static-http"},
+        {"const": "capability-relay"}
+      ],
+      "items": false
+    },
+    "clean_room_requirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "portable_inputs_only",
+        "private_source_repository_access",
+        "private_context_connector_access",
+        "hidden_provider_memory_dependency"
+      ],
+      "properties": {
+        "portable_inputs_only": {"const": true},
+        "private_source_repository_access": {"const": false},
+        "private_context_connector_access": {"const": false},
+        "hidden_provider_memory_dependency": {"const": false}
+      }
+    },
+    "negative_space_checks": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "prefixItems": [
+        {"const": "style_leakage"},
+        {"const": "unsupported_historical_interpolation"},
+        {"const": "accidental_private_source_dependency"}
+      ],
+      "items": false
+    },
+    "aggregation": {"const": "forbidden-keep-dimensions-separate"},
+    "boundaries": {"$ref": "#/$defs/boundaries"}
+  },
+  "$defs": {
+    "dimension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "order", "measurement"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9_.-]+$"},
+        "order": {"type": "integer", "minimum": 1},
+        "measurement": {"type": "string", "pattern": "^[a-z0-9_.-]+$"}
+      }
+    },
+    "boundaries": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "prefixItems": [
+        {"const": "STYLE_FIDELITY != FACTUAL_ACCURACY != PHYSICAL_TRUTH"},
+        {"const": "ROUTE_SUFFICIENCY != ROUTE_MINIMALITY"},
+        {"const": "HISTORICAL_COVERAGE != HISTORICAL_TRUTH"},
+        {"const": "TRANSPORT_EQUIVALENCE != AUTHORITY"},
+        {"const": "CLEAN_ROOM_SUCCESS != PRIVATE_SOURCE_ACCESS"},
+        {"const": "MEASURED_OBSERVATION != AUTOMATIC_TRUTH"},
+        {"const": "AGGREGATE_SCORE = FORBIDDEN"}
+      ],
+      "items": false
+    }
+  }
+}

@@ -1,8 +1,8 @@
 # QSOL-THOTH
 
-**Public deterministic routing and portable resolution layer for the QSOL-CONCAP system.**
+**Public deterministic routing, portable resolution, session-style, and conformance layer for the QSOL-CONCAP system.**
 
-QSOL-THOTH decides **which semantic context capsules are needed** for a declared task, **which ESS-style receiver state should be used**, and—when given an explicit portable object index—**which immutable objects satisfy those roles**. It does not store private context, capsule payloads, model memory, credentials, transport secrets, or factual authority.
+QSOL-THOTH decides **which semantic context capsules are needed** for a declared task, **which ESS-style receiver state should be used**, and—when given an explicit portable object index—**which immutable objects satisfy those roles**. It also validates private instance-history metadata, replays explicit multi-turn style events, and builds separated QSOL-ARK evaluation receipts. It does not store private context, real capsule payloads, model memory, credentials, transport secrets, or factual authority.
 
 ## Architecture
 
@@ -23,10 +23,14 @@ portable CONCAP bundle
         |
         v
 QSOL-THOTH
-  routing + ESS + transport-neutral resolution
+  routing + multi-turn ESS + transport-neutral resolution
         |
         v
 model / consumer
+        |
+        v
+QSOL-ARK
+  explicit clean-room evaluation authority
 ```
 
 QSOL-CAPSULES remains the private immutable recovery-artifact store. A consumer does not need access to QSOL-CONTEXT or QSOL-CAPSULES merely to load an approved portable export.
@@ -87,6 +91,9 @@ See `PORTABLE-CONCAPS.md`.
 python3 tools/thoth.py validate
 python3 tools/thoth.py conformance
 python3 tools/concap_resolver.py validate-bindings
+python3 tools/instance_history.py validate --history examples/instances/synthetic-instance-history.json
+python3 tools/ark_evaluation.py validate-policy
+python3 tools/ess_session.py validate-policy
 python3 -m unittest discover -s tests -v
 ```
 
@@ -124,6 +131,31 @@ python3 tools/history_minset.py reconstruct --basis /tmp/history-basis.json
 
 See `HISTORY-CONCAP.md`.
 
+## Immutable instance history
+
+`tools/instance_history.py` validates caller-supplied private metadata for accepted CONCAP snapshots without reading or publishing capsule payloads. Snapshot identities bind source, source projection, generator, policy, verification receipt, role, capsule hash, and size. A separate append-only command rejects truncation or mutation of an accepted history prefix.
+
+The committed example is explicitly `synthetic-conformance`; it is not evidence that a real QSOL-CAPSULES snapshot was generated.
+
+See `INSTANCE-HISTORY.md`.
+
+## QSOL-ARK evaluation
+
+`tools/ark_evaluation.py` turns explicit observations into a deterministic evaluation receipt. Route sufficiency, route minimality, style fidelity, factual accuracy, and historical coverage remain separate exact fractions. Clean-room requirements, four-transport byte equivalence, and negative-space violations fail closed. No aggregate truth score is emitted.
+
+See `ARK-EVALUATION.md`.
+
+## Multi-turn ESS sessions
+
+`tools/ess_session.py` persists receiver style across routed turns until an explicit transition or reset. It supports immediate switching plus a demonstrated deterministic hysteresis/dwell profile, rebuilds each effective route with the persisted style's support CONCAPs, and emits chained acyclic transition receipts.
+
+```bash
+python3 tools/ess_session.py replay \
+  --session examples/ess/demonstrated-hysteresis.session.json
+```
+
+See `ESS-SESSIONS.md`.
+
 ## Hard boundaries
 
 ```text
@@ -131,6 +163,7 @@ CONCAP_ID != CAPSULE_BYTES
 PUBLIC_ROUTE != PRIVATE_PAYLOAD
 ROUTING != FACTUAL_AUTHORITY
 STYLE_SWITCH != EPISTEMIC_SWITCH
+STYLE_PERSISTENCE != EPISTEMIC_PERSISTENCE
 STYLE_SUPPORT != EVIDENCE
 SELECTED != LOADED
 LOADED != TRUE
@@ -144,6 +177,11 @@ OBJECT_IDENTITY != TRANSPORT_LOCATION
 RESOLUTION != FACTUAL_AUTHORITY
 MODEL_CAN_RECONSTRUCT_CONTEXT != MODEL_CAN_ACCESS_PRIVATE_SOURCE
 RESTORED_CONTEXT != ORIGINAL_ASSISTANT_INSTANCE
+INSTANCE_HISTORY != CAPSULE_BYTES
+SNAPSHOT_APPEND_ONLY != SOURCE_IMMUTABLE
+STYLE_FIDELITY != FACTUAL_ACCURACY != PHYSICAL_TRUTH
+TRANSPORT_EQUIVALENCE != AUTHORITY
+REPLAY_RECEIPT != HIDDEN_STATE
 ```
 
 For exact recovery of an original source file, retain its bytes directly or through a lossless deterministic encoding. Portable delivery changes how approved bytes reach a consumer; it does not change their epistemic status.

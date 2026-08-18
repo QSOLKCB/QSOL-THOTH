@@ -1,0 +1,37 @@
+{
+  "protocol": "QSOL-THOTH/ESS-SESSION-POLICY/1",
+  "schema_version": "1.0.0",
+  "authority": "receiver-style-only",
+  "initialization": "first-route-default-or-explicit-transition",
+  "persistence": "current-style-persists-until-explicit-transition-or-reset",
+  "profiles": [
+    {
+      "id": "immediate",
+      "order": 10,
+      "minimum_dwell_routes": 0,
+      "transition_confirmations": 1
+    },
+    {
+      "id": "demonstrated_hysteresis",
+      "order": 20,
+      "minimum_dwell_routes": 1,
+      "transition_confirmations": 2
+    }
+  ],
+  "reset": "clear-style-next-route-reinitializes",
+  "canonical_inputs": {
+    "model_inferred_transitions": false,
+    "wall_clock_input": false,
+    "random_input": false,
+    "network_input": false
+  },
+  "boundaries": [
+    "STYLE_SWITCH != EPISTEMIC_SWITCH",
+    "STYLE_PERSISTENCE != EPISTEMIC_PERSISTENCE",
+    "EXPLICIT_STYLE_TRANSITION != MODEL_INFERENCE",
+    "ROUTE_DEFAULT != FORCED_SESSION_TRANSITION",
+    "HYSTERESIS != AMBIGUITY",
+    "DWELL_COUNT != WALL_CLOCK_TIME",
+    "REPLAY_RECEIPT != HIDDEN_STATE"
+  ]
+}

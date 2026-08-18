@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.invalid/schemas/thoth-ark-evaluation-observation-v1.json",
+  "title": "QSOL-ARK THOTH Evaluation Observation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol",
+    "schema_version",
+    "trial_id",
+    "assessment_authority",
+    "route",
+    "style_fidelity",
+    "factual_accuracy",
+    "historical_reconstruction",
+    "clean_room",
+    "transports",
+    "negative_space",
+    "boundaries"
+  ],
+  "properties": {
+    "protocol": {"const": "QSOL-ARK/THOTH-EVALUATION-OBSERVATION/1"},
+    "schema_version": {"const": "1.0.0"},
+    "trial_id": {"$ref": "#/$defs/token"},
+    "assessment_authority": {"const": "explicit-observations-not-automatic-truth"},
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["selected_role_ids", "required_role_ids", "justified_role_ids"],
+      "properties": {
+        "selected_role_ids": {"$ref": "#/$defs/roleList"},
+        "required_role_ids": {"$ref": "#/$defs/roleList"},
+        "justified_role_ids": {"$ref": "#/$defs/roleList"}
+      }
+    },
+    "style_fidelity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["obligations"],
+      "properties": {
+        "obligations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/styleObservation"}
+        }
+      }
+    },
+    "factual_accuracy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claims"],
+      "properties": {
+        "claims": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/factObservation"}
+        }
+      }
+    },
+    "historical_reconstruction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["obligations"],
+      "properties": {
+        "obligations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/historyObservation"}
+        }
+      }
+    },
+    "clean_room": {"$ref": "#/$defs/cleanRoom"},
+    "transports": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {"$ref": "#/$defs/transport"}
+    },
+    "negative_space": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "style_leakage",
+        "unsupported_historical_interpolation",
+        "accidental_private_source_dependency"
+      ],
+      "properties": {
+        "style_leakage": {"const": false},
+        "unsupported_historical_interpolation": {"const": false},
+        "accidental_private_source_dependency": {"const": false}
+      }
+    },
+    "boundaries": {"$ref": "#/$defs/boundaries"}
+  },
+  "$defs": {
+    "token": {"type": "string", "pattern": "^[a-z0-9_.-]+$"},
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "role": {"type": "string", "pattern": "^concap\\.[a-z0-9_.-]+/[1-9][0-9]*$"},
+    "roleList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/role"}
+    },
+    "styleObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "outcome"],
+      "properties": {
+        "id": {"$ref": "#/$defs/token"},
+        "outcome": {"enum": ["pass", "fail", "not_observed"]}
+      }
+    },
+    "factObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "outcome"],
+      "properties": {
+        "id": {"$ref": "#/$defs/token"},
+        "outcome": {"enum": ["correct", "incorrect", "unverified"]}
+      }
+    },
+    "historyObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "outcome"],
+      "properties": {
+        "id": {"$ref": "#/$defs/token"},
+        "outcome": {"enum": ["covered", "missed", "unverified"]}
+      }
+    },
+    "cleanRoom": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "portable_inputs_only",
+        "private_source_repository_access",
+        "private_context_connector_access",
+        "hidden_provider_memory_dependency"
+      ],
+      "properties": {
+        "portable_inputs_only": {"const": true},
+        "private_source_repository_access": {"const": false},
+        "private_context_connector_access": {"const": false},
+        "hidden_provider_memory_dependency": {"const": false}
+      }
+    },
+    "transportObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["object_id", "size_bytes", "bytes_sha256"],
+      "properties": {
+        "object_id": {"$ref": "#/$defs/sha256"},
+        "size_bytes": {"type": "integer", "minimum": 0},
+        "bytes_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "transport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "objects"],
+      "properties": {
+        "id": {"enum": ["local-directory", "archive", "static-http", "capability-relay"]},
+        "objects": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/transportObject"}
+        }
+      }
+    },
+    "boundaries": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "prefixItems": [
+        {"const": "STYLE_FIDELITY != FACTUAL_ACCURACY != PHYSICAL_TRUTH"},
+        {"const": "ROUTE_SUFFICIENCY != ROUTE_MINIMALITY"},
+        {"const": "HISTORICAL_COVERAGE != HISTORICAL_TRUTH"},
+        {"const": "TRANSPORT_EQUIVALENCE != AUTHORITY"},
+        {"const": "CLEAN_ROOM_SUCCESS != PRIVATE_SOURCE_ACCESS"},
+        {"const": "MEASURED_OBSERVATION != AUTOMATIC_TRUTH"},
+        {"const": "AGGREGATE_SCORE = FORBIDDEN"}
+      ],
+      "items": false
+    }
+  }
+}

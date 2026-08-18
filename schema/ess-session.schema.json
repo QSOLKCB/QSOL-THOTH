@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.invalid/schemas/thoth-ess-session-v1.json",
+  "title": "QSOL-THOTH ESS Session Event Log",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol", "schema_version", "session_id", "profile_id", "events", "boundaries"],
+  "properties": {
+    "protocol": {"const": "QSOL-THOTH/ESS-SESSION/1"},
+    "schema_version": {"const": "1.0.0"},
+    "session_id": {"$ref": "#/$defs/token"},
+    "profile_id": {"enum": ["immediate", "demonstrated_hysteresis"]},
+    "events": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {"$ref": "#/$defs/routeEvent"},
+          {"$ref": "#/$defs/transitionEvent"},
+          {"$ref": "#/$defs/resetEvent"}
+        ]
+      }
+    },
+    "boundaries": {"$ref": "#/$defs/boundaries"}
+  },
+  "$defs": {
+    "token": {"type": "string", "pattern": "^[a-z0-9_.-]+$"},
+    "routeEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sequence", "event_id", "kind", "request"],
+      "properties": {
+        "sequence": {"type": "integer", "minimum": 1},
+        "event_id": {"$ref": "#/$defs/token"},
+        "kind": {"const": "route"},
+        "request": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["protocol", "intent"],
+          "properties": {
+            "protocol": {"const": "QSOL-THOTH/ROUTE-REQUEST/1"},
+            "intent": {"$ref": "#/$defs/token"}
+          }
+        }
+      }
+    },
+    "transitionEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sequence", "event_id", "kind", "target_style"],
+      "properties": {
+        "sequence": {"type": "integer", "minimum": 1},
+        "event_id": {"$ref": "#/$defs/token"},
+        "kind": {"const": "transition"},
+        "target_style": {"$ref": "#/$defs/token"}
+      }
+    },
+    "resetEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sequence", "event_id", "kind"],
+      "properties": {
+        "sequence": {"type": "integer", "minimum": 1},
+        "event_id": {"$ref": "#/$defs/token"},
+        "kind": {"const": "reset"}
+      }
+    },
+    "boundaries": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "prefixItems": [
+        {"const": "STYLE_SWITCH != EPISTEMIC_SWITCH"},
+        {"const": "STYLE_PERSISTENCE != EPISTEMIC_PERSISTENCE"},
+        {"const": "EXPLICIT_STYLE_TRANSITION != MODEL_INFERENCE"},
+        {"const": "ROUTE_DEFAULT != FORCED_SESSION_TRANSITION"},
+        {"const": "HYSTERESIS != AMBIGUITY"},
+        {"const": "DWELL_COUNT != WALL_CLOCK_TIME"},
+        {"const": "REPLAY_RECEIPT != HIDDEN_STATE"}
+      ],
+      "items": false
+    }
+  }
+}
