@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.invalid/schemas/thoth-route-decision-v1.json",
+  "title": "QSOL-THOTH Route Decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol",
+    "canonical_intent",
+    "style",
+    "concaps",
+    "request_sha256",
+    "configuration_sha256",
+    "implementation_sha256",
+    "decision_sha256",
+    "boundaries"
+  ],
+  "properties": {
+    "protocol": {
+      "const": "QSOL-THOTH/ROUTE-DECISION/1"
+    },
+    "canonical_intent": {
+      "type": "string",
+      "pattern": "^[a-z0-9_.-]+$"
+    },
+    "style": {
+      "type": "string",
+      "pattern": "^[a-z0-9_.-]+$"
+    },
+    "concaps": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "request_sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "configuration_sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "implementation_sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "decision_sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "boundaries": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    }
+  }
+}

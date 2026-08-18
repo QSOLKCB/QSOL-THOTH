@@ -1,0 +1,86 @@
+{
+  "protocol": "QSOL-THOTH/ROUTER/1",
+  "schema_version": "1.0.0",
+  "unknown_intent_policy": "fail_closed",
+  "intent_token_pattern": "^[a-z0-9_.-]+$",
+  "routes": [
+    {
+      "intent": "general",
+      "aliases": ["default"],
+      "order": 10,
+      "default_style": "neutral",
+      "concaps": [
+        "concap.identity.core/1",
+        "concap.workstyle.engineering/1"
+      ]
+    },
+    {
+      "intent": "software_review",
+      "aliases": ["code_review", "bugfix"],
+      "order": 20,
+      "default_style": "technical",
+      "concaps": [
+        "concap.identity.core/1",
+        "concap.workstyle.engineering/1",
+        "concap.receipts/1"
+      ]
+    },
+    {
+      "intent": "formal_claim",
+      "aliases": ["formalization", "proof"],
+      "order": 30,
+      "default_style": "formal",
+      "concaps": [
+        "concap.workstyle.engineering/1",
+        "concap.research.active/1",
+        "concap.receipts/1"
+      ]
+    },
+    {
+      "intent": "research",
+      "aliases": ["analysis", "research_review"],
+      "order": 40,
+      "default_style": "research",
+      "concaps": [
+        "concap.workstyle.engineering/1",
+        "concap.research.active/1",
+        "concap.receipts/1"
+      ]
+    },
+    {
+      "intent": "creative",
+      "aliases": ["creative_work", "music"],
+      "order": 50,
+      "default_style": "creative",
+      "concaps": [
+        "concap.culture.core/1",
+        "concap.culture.music/1"
+      ]
+    },
+    {
+      "intent": "comedy",
+      "aliases": ["humour", "standup"],
+      "order": 60,
+      "default_style": "australian_humour",
+      "concaps": [
+        "concap.culture.core/1",
+        "concap.culture.au-humour/1",
+        "concap.culture.comedy/1"
+      ]
+    }
+  ],
+  "selection_contract": {
+    "canonical_matching": "exact ASCII token",
+    "alias_resolution": "exact declared alias only",
+    "fuzzy_matching": false,
+    "embedding_matching": false,
+    "model_guessing": false,
+    "route_priority": "not used for matching; order is canonical serialization and audit order only"
+  },
+  "boundaries": [
+    "ROUTING != FACTUAL_AUTHORITY",
+    "ROUTE_DECISION != CAPSULE_AVAILABILITY",
+    "SELECTED != LOADED",
+    "STYLE_SUPPORT != EVIDENCE"
+  ]
+}
