@@ -13,6 +13,7 @@ import history_minset as history
 
 DATASET_PATH = ROOT / "examples" / "history" / "world-history-scaffold.json"
 POLICY_PATH = ROOT / "ai" / "history-reconstruction-policy.json"
+BASIS_SCHEMA_PATH = ROOT / "schema" / "history-basis.schema.json"
 
 
 class HistoricalReconstructionTests(unittest.TestCase):
@@ -67,6 +68,69 @@ class HistoricalReconstructionTests(unittest.TestCase):
         dataset["records"][0]["requires"] = ["digital_anchor"]
         with self.assertRaisesRegex(history.HistoryError, "E_HISTORY_DEPENDENCY_CYCLE"):
             history.plan_minimum(dataset, self.policy)
+
+    def test_long_dependency_chain_is_iterative(self):
+        record_count = 1100
+        records = []
+        for index in range(record_count):
+            record_id = f"r{index:04d}"
+            records.append({
+                "id": record_id,
+                "order": index + 1,
+                "kind": "anchor",
+                "summary": record_id,
+                "claims": [f"c{index:04d}"],
+                "requires": [] if index == 0 else [f"r{index - 1:04d}"],
+            })
+        dataset = {
+            "protocol": "QSOL-THOTH/HISTORY-DATASET/1",
+            "schema_version": "1.0.0",
+            "id": "long_dependency_chain",
+            "authority": "demonstration-only",
+            "retention_obligations": [f"c{record_count - 1:04d}"],
+            "records": records,
+            "boundaries": list(history.PLAN_BOUNDARIES),
+        }
+        plan = history.plan_minimum(dataset, self.policy)
+        self.assertEqual(plan["selected_record_count"], record_count)
+        self.assertEqual(plan["selected_records"][0], "r0000")
+        self.assertEqual(plan["selected_records"][-1], f"r{record_count - 1:04d}")
+
+    def test_unhashable_array_elements_fail_with_stable_errors(self):
+        cases = []
+
+        bad_obligation = copy.deepcopy(self.dataset)
+        bad_obligation["retention_obligations"] = [{"not": "a-token"}]
+        cases.append((history.validate_dataset, bad_obligation, "E_HISTORY_OBLIGATIONS"))
+
+        bad_claim = copy.deepcopy(self.dataset)
+        bad_claim["records"][0]["claims"] = [["nested"]]
+        cases.append((history.validate_dataset, bad_claim, "E_HISTORY_RECORD"))
+
+        bad_boundary = copy.deepcopy(self.dataset)
+        bad_boundary["boundaries"].append({"not": "a-boundary"})
+        cases.append((history.validate_dataset, bad_boundary, "E_HISTORY_BOUNDARIES"))
+
+        bad_basis = history.build_basis(self.dataset, self.policy)
+        bad_basis["retention_obligations"] = [{"not": "a-token"}]
+        cases.append((history.validate_basis, bad_basis, "E_HISTORY_BASIS"))
+
+        for validator, value, code in cases:
+            with self.subTest(code=code):
+                with self.assertRaisesRegex(history.HistoryError, code):
+                    validator(value)
+
+    def test_basis_schema_defines_record_items(self):
+        schema = history.load_json(BASIS_SCHEMA_PATH)
+        record_schema = schema["properties"]["records"]["items"]
+        self.assertEqual(record_schema["type"], "object")
+        self.assertFalse(record_schema["additionalProperties"])
+        self.assertEqual(
+            set(record_schema["required"]),
+            {"id", "order", "kind", "summary", "claims", "requires"},
+        )
+        self.assertEqual(record_schema["properties"]["claims"]["items"]["type"], "string")
+        self.assertEqual(record_schema["properties"]["requires"]["items"]["type"], "string")
 
     def test_search_budget_is_deterministic(self):
         policy = copy.deepcopy(self.policy)
