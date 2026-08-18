@@ -51,9 +51,9 @@
             "unjustified_selected_roles": {"$ref": "#/$defs/roleList"}
           }
         },
-        "style_fidelity": {"$ref": "#/$defs/outcomeMetric"},
-        "factual_accuracy": {"$ref": "#/$defs/outcomeMetric"},
-        "historical_reconstruction_coverage": {"$ref": "#/$defs/outcomeMetric"}
+        "style_fidelity": {"$ref": "#/$defs/styleOutcomeMetric"},
+        "factual_accuracy": {"$ref": "#/$defs/factualOutcomeMetric"},
+        "historical_reconstruction_coverage": {"$ref": "#/$defs/historicalOutcomeMetric"}
       }
     },
     "transport_equivalence": {
@@ -102,7 +102,7 @@
         "denominator": {"type": "integer", "minimum": 1}
       }
     },
-    "outcomeMetric": {
+    "styleOutcomeMetric": {
       "type": "object",
       "additionalProperties": false,
       "required": ["fraction", "counts"],
@@ -110,9 +110,49 @@
         "fraction": {"$ref": "#/$defs/fraction"},
         "counts": {
           "type": "object",
-          "additionalProperties": {"type": "integer", "minimum": 0},
-          "minProperties": 3,
-          "maxProperties": 3
+          "additionalProperties": false,
+          "required": ["pass", "fail", "not_observed"],
+          "properties": {
+            "pass": {"type": "integer", "minimum": 0},
+            "fail": {"type": "integer", "minimum": 0},
+            "not_observed": {"type": "integer", "minimum": 0}
+          }
+        }
+      }
+    },
+    "factualOutcomeMetric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fraction", "counts"],
+      "properties": {
+        "fraction": {"$ref": "#/$defs/fraction"},
+        "counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["correct", "incorrect", "unverified"],
+          "properties": {
+            "correct": {"type": "integer", "minimum": 0},
+            "incorrect": {"type": "integer", "minimum": 0},
+            "unverified": {"type": "integer", "minimum": 0}
+          }
+        }
+      }
+    },
+    "historicalOutcomeMetric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fraction", "counts"],
+      "properties": {
+        "fraction": {"$ref": "#/$defs/fraction"},
+        "counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["covered", "missed", "unverified"],
+          "properties": {
+            "covered": {"type": "integer", "minimum": 0},
+            "missed": {"type": "integer", "minimum": 0},
+            "unverified": {"type": "integer", "minimum": 0}
+          }
         }
       }
     },

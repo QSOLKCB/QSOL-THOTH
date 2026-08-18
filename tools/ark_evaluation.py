@@ -22,7 +22,6 @@ from deterministic_contract import (
     require,
     require_concap,
     require_sha256,
-    require_sorted_unique_strings,
     require_token,
 )
 
@@ -68,16 +67,25 @@ BOUNDARIES = (
 )
 
 
-def registry_roles() -> set[str]:
+def registry_role_order() -> dict[str, int]:
     registry = load_json(REGISTRY_PATH, PREFIX)
     capsules = registry.get("capsules")
     require(isinstance(capsules, list), "E_ARK_EVAL_REGISTRY", "registry capsules must be an array")
-    roles: set[str] = set()
+    roles: dict[str, int] = {}
+    orders: set[int] = set()
     for index, item in enumerate(capsules):
         require(isinstance(item, dict), "E_ARK_EVAL_REGISTRY", f"registry capsules[{index}] must be an object")
         role_id = require_concap(item.get("id"), f"registry capsules[{index}].id", PREFIX)
         require(role_id not in roles, "E_ARK_EVAL_REGISTRY", f"duplicate registry role: {role_id}")
-        roles.add(role_id)
+        order = item.get("order")
+        require(
+            isinstance(order, int) and not isinstance(order, bool) and order > 0,
+            "E_ARK_EVAL_REGISTRY",
+            f"registry capsules[{index}].order must be a positive integer",
+        )
+        require(order not in orders, "E_ARK_EVAL_REGISTRY", f"duplicate registry order: {order}")
+        roles[role_id] = order
+        orders.add(order)
     return roles
 
 
@@ -157,7 +165,9 @@ def validate_outcomes(
     for index, item in enumerate(observations):
         item = exact_keys(item, {"id", "outcome"}, f"{where}.{item_key}[{index}]", PREFIX)
         observation_id = require_token(item["id"], f"{where}.{item_key}[{index}].id", PREFIX)
-        require(item["outcome"] in allowed, "E_ARK_EVAL_OUTCOME", f"{where}.{item_key}[{index}] has unknown outcome")
+        outcome = item["outcome"]
+        require(isinstance(outcome, str), "E_ARK_EVAL_OUTCOME", f"{where}.{item_key}[{index}].outcome must be a string")
+        require(outcome in allowed, "E_ARK_EVAL_OUTCOME", f"{where}.{item_key}[{index}] has unknown outcome")
         ids.append(observation_id)
         out.append(item)
     require(len(ids) == len(set(ids)), "E_ARK_EVAL_DUPLICATE", f"{where}.{item_key} ids must be unique")
@@ -165,12 +175,17 @@ def validate_outcomes(
     return out
 
 
-def validate_route(value: Any, roles: set[str]) -> dict[str, Any]:
+def validate_route(value: Any, role_order: dict[str, int]) -> dict[str, Any]:
     route = exact_keys(value, {"selected_role_ids", "required_role_ids", "justified_role_ids"}, "route", PREFIX)
     for key in ("selected_role_ids", "required_role_ids", "justified_role_ids"):
-        checked = require_sorted_unique_strings(route[key], f"route.{key}", PREFIX, non_empty=True, kind="concap")
-        unknown = sorted(set(checked) - roles)
+        roles = route[key]
+        require(isinstance(roles, list) and roles, "E_ARK_EVAL_ARRAY", f"route.{key} must be a non-empty array")
+        checked = [require_concap(role_id, f"route.{key}[{index}]", PREFIX) for index, role_id in enumerate(roles)]
+        require(len(checked) == len(set(checked)), "E_ARK_EVAL_DUPLICATE", f"route.{key} must contain unique entries")
+        unknown = sorted(set(checked) - set(role_order), key=lambda item: item.encode("utf-8"))
         require(not unknown, "E_ARK_EVAL_UNKNOWN_ROLE", f"route.{key} contains unregistered roles: {unknown}")
+        expected = sorted(checked, key=lambda item: (role_order[item], item.encode("utf-8")))
+        require(checked == expected, "E_ARK_EVAL_ORDER", f"route.{key} must follow canonical registry order")
     required = set(route["required_role_ids"])
     justified = set(route["justified_role_ids"])
     require(required <= justified, "E_ARK_EVAL_ROUTE_JUSTIFICATION", "every required role must also be justified")
@@ -183,7 +198,7 @@ def validate_transport_object(value: Any, where: str) -> dict[str, Any]:
     byte_hash = require_sha256(item["bytes_sha256"], f"{where}.bytes_sha256", PREFIX)
     require(object_id == byte_hash, "E_ARK_EVAL_OBJECT_IDENTITY", f"{where}: object identity must equal exact byte hash")
     size = item["size_bytes"]
-    require(isinstance(size, int) and not isinstance(size, bool) and size > 0, "E_ARK_EVAL_OBJECT_SIZE", f"{where}.size_bytes must be positive")
+    require(isinstance(size, int) and not isinstance(size, bool) and size >= 0, "E_ARK_EVAL_OBJECT_SIZE", f"{where}.size_bytes must be non-negative")
     return item
 
 
@@ -243,7 +258,7 @@ def validate_observation(observation: Any, policy: dict[str, Any]) -> dict[str, 
         "E_ARK_EVAL_AUTHORITY",
         "evaluation observations cannot claim automatic truth",
     )
-    validate_route(value["route"], registry_roles())
+    validate_route(value["route"], registry_role_order())
     style = validate_outcomes(value["style_fidelity"], "style_fidelity", "obligations", {"pass", "fail", "not_observed"})
     facts = validate_outcomes(value["factual_accuracy"], "factual_accuracy", "claims", {"correct", "incorrect", "unverified"})
     historical = validate_outcomes(value["historical_reconstruction"], "historical_reconstruction", "obligations", {"covered", "missed", "unverified"})
@@ -287,8 +302,9 @@ def evaluate(observation: dict[str, Any], policy: dict[str, Any]) -> dict[str, A
     selected = set(checked["route"]["selected_role_ids"])
     required = set(checked["route"]["required_role_ids"])
     justified = set(checked["route"]["justified_role_ids"])
-    missing = sorted(required - selected, key=lambda item: item.encode("utf-8"))
-    unjustified = sorted(selected - justified, key=lambda item: item.encode("utf-8"))
+    role_order = registry_role_order()
+    missing = sorted(required - selected, key=lambda item: (role_order[item], item.encode("utf-8")))
+    unjustified = sorted(selected - justified, key=lambda item: (role_order[item], item.encode("utf-8")))
 
     style_items = checked["style_fidelity"]["obligations"]
     style_counts = count_outcomes(style_items, ("pass", "fail", "not_observed"))

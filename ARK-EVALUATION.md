@@ -38,6 +38,8 @@ python3 tools/ark_evaluation.py evaluate \
 
 The output is `QSOL-ARK/THOTH-EVALUATION-RECEIPT/1` with an acyclic `evaluation_sha256`.
 
+Observed route-role lists preserve canonical CONCAP registry order, matching normal THOTH route decisions. Outcome values are typed and validated against their dimension-specific vocabulary before counting.
+
 ## Clean-room contract
 
 An accepted observation must declare:
@@ -60,7 +62,7 @@ static-http
 capability-relay
 ```
 
-All four object observations must match byte-for-byte. The transport itself remains outside object identity and authority.
+All four object observations must match byte-for-byte. Byte sizes use the portable resolver's non-negative rule, including valid zero-byte objects. The transport itself remains outside object identity and authority.
 
 ```text
 TRANSPORT_EQUIVALENCE != AUTHORITY

@@ -108,6 +108,7 @@ def validate_snapshot(
     index: int,
     expected_predecessor: str | None,
     roles: set[str],
+    capsule_sizes_by_hash: dict[str, int],
 ) -> dict[str, Any]:
     where = f"snapshots[{index}]"
     value = exact_keys(
@@ -157,7 +158,16 @@ def validate_snapshot(
         require(role_id not in seen_roles, "E_INSTANCE_DUPLICATE_ROLE", f"{where}: duplicate role {role_id}")
         seen_roles.add(role_id)
         ordered_roles.append(role_id)
-        metadata = (item["capsule_sha256"], item["size_bytes"])
+        capsule_sha256 = item["capsule_sha256"]
+        size_bytes = item["size_bytes"]
+        prior_size = capsule_sizes_by_hash.get(capsule_sha256)
+        require(
+            prior_size is None or prior_size == size_bytes,
+            "E_INSTANCE_CAPSULE_CONFLICT",
+            f"{where}: conflicting size metadata for {capsule_sha256}",
+        )
+        capsule_sizes_by_hash[capsule_sha256] = size_bytes
+        metadata = (capsule_sha256, size_bytes)
         prior = capsule_metadata.get(item["capsule_name"])
         require(prior is None or prior == metadata, "E_INSTANCE_CAPSULE_CONFLICT", f"{where}: conflicting metadata for {item['capsule_name']}")
         capsule_metadata[item["capsule_name"]] = metadata
@@ -181,8 +191,10 @@ def validate_history(history: Any) -> dict[str, Any]:
     )
     require(value["protocol"] == PROTOCOL, "E_INSTANCE_PROTOCOL", "unexpected instance-history protocol")
     require(value["schema_version"] == "1.0.0", "E_INSTANCE_VERSION", "unsupported instance-history version")
+    record_class = value["record_class"]
     require(
-        value["record_class"] in {"accepted-private-metadata", "synthetic-conformance"},
+        isinstance(record_class, str)
+        and record_class in {"accepted-private-metadata", "synthetic-conformance"},
         "E_INSTANCE_RECORD_CLASS",
         "unknown instance-history record_class",
     )
@@ -193,8 +205,9 @@ def validate_history(history: Any) -> dict[str, Any]:
     roles = known_roles()
     predecessor: str | None = None
     seen_snapshots: set[str] = set()
+    capsule_sizes_by_hash: dict[str, int] = {}
     for index, snapshot in enumerate(snapshots):
-        checked = validate_snapshot(snapshot, index, predecessor, roles)
+        checked = validate_snapshot(snapshot, index, predecessor, roles, capsule_sizes_by_hash)
         snapshot_id = checked["snapshot_id"]
         require(snapshot_id not in seen_snapshots, "E_INSTANCE_DUPLICATE_SNAPSHOT", f"duplicate snapshot: {snapshot_id}")
         seen_snapshots.add(snapshot_id)
@@ -228,6 +241,11 @@ def validation_report(history: dict[str, Any]) -> dict[str, Any]:
 def check_append_only(base: dict[str, Any], candidate: dict[str, Any]) -> dict[str, Any]:
     old = validate_history(base)
     new = validate_history(candidate)
+    require(
+        new["record_class"] == old["record_class"],
+        "E_INSTANCE_APPEND_RECORD_CLASS",
+        "candidate history changes the accepted record_class",
+    )
     old_snapshots = old["snapshots"]
     new_snapshots = new["snapshots"]
     require(len(new_snapshots) >= len(old_snapshots), "E_INSTANCE_APPEND_TRUNCATION", "candidate history truncates accepted snapshots")

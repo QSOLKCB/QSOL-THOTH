@@ -65,9 +65,9 @@ class ArkEvaluationTests(unittest.TestCase):
 
         changed = copy.deepcopy(self.observation)
         changed["route"]["selected_role_ids"] = [
-            "concap.culture.core/1",
             "concap.identity.core/1",
             "concap.workstyle.engineering/1",
+            "concap.culture.core/1",
         ]
         receipt = evaluation.evaluate(changed, self.policy)
         self.assertEqual(receipt["metrics"]["route_sufficiency"]["fraction"], {"numerator": 2, "denominator": 2})
@@ -109,6 +109,39 @@ class ArkEvaluationTests(unittest.TestCase):
             item["outcome"] = "unverified"
         with self.assertRaisesRegex(ContractError, "E_ARK_EVAL_UNASSESSED"):
             evaluation.evaluate(changed, self.policy)
+
+    def test_non_string_outcomes_fail_with_contract_error(self):
+        for invalid in ([], {}):
+            with self.subTest(invalid=invalid):
+                changed = copy.deepcopy(self.observation)
+                changed["style_fidelity"]["obligations"][0]["outcome"] = invalid
+                with self.assertRaisesRegex(ContractError, "E_ARK_EVAL_OUTCOME"):
+                    evaluation.evaluate(changed, self.policy)
+
+    def test_canonical_route_lists_use_registry_order(self):
+        decision = thoth.route_request(
+            {"protocol": "QSOL-THOTH/ROUTE-REQUEST/1", "intent": "software_review"}
+        )
+        lexical = sorted(decision["concaps"], key=lambda item: item.encode("utf-8"))
+        self.assertNotEqual(decision["concaps"], lexical)
+
+        changed = copy.deepcopy(self.observation)
+        for key in ("selected_role_ids", "required_role_ids", "justified_role_ids"):
+            changed["route"][key] = list(decision["concaps"])
+        receipt = evaluation.evaluate(changed, self.policy)
+        self.assertEqual(receipt["metrics"]["route_sufficiency"]["fraction"], {"numerator": 3, "denominator": 3})
+
+        for key in ("selected_role_ids", "required_role_ids", "justified_role_ids"):
+            changed["route"][key] = lexical
+        with self.assertRaisesRegex(ContractError, "E_ARK_EVAL_ORDER"):
+            evaluation.evaluate(changed, self.policy)
+
+    def test_zero_byte_transport_objects_are_allowed(self):
+        changed = copy.deepcopy(self.observation)
+        for transport in changed["transports"]:
+            transport["objects"][0]["size_bytes"] = 0
+        receipt = evaluation.evaluate(changed, self.policy)
+        self.assertEqual(receipt["transport_equivalence"]["object_count"], 1)
 
     def test_synthetic_object_receipt_matches_actual_public_bytes(self):
         payload = OBJECT.read_bytes()
@@ -162,6 +195,22 @@ class ArkEvaluationTests(unittest.TestCase):
         receipt_schema = json.loads((ROOT / "schema" / "ark-evaluation-receipt.schema.json").read_text(encoding="utf-8"))
         self.assertNotIn("score", receipt_schema["properties"])
         self.assertNotIn("overall", receipt_schema["properties"])
+        outcome_schemas = {
+            "style_fidelity": ("styleOutcomeMetric", {"pass", "fail", "not_observed"}),
+            "factual_accuracy": ("factualOutcomeMetric", {"correct", "incorrect", "unverified"}),
+            "historical_reconstruction_coverage": ("historicalOutcomeMetric", {"covered", "missed", "unverified"}),
+        }
+        metric_properties = receipt_schema["properties"]["metrics"]["properties"]
+        for dimension, (definition, expected_counts) in outcome_schemas.items():
+            with self.subTest(dimension=dimension):
+                self.assertEqual(metric_properties[dimension], {"$ref": f"#/$defs/{definition}"})
+                counts = receipt_schema["$defs"][definition]["properties"]["counts"]
+                self.assertFalse(counts["additionalProperties"])
+                self.assertEqual(set(counts["required"]), expected_counts)
+                self.assertEqual(set(counts["properties"]), expected_counts)
+
+        observation_schema = json.loads((ROOT / "schema" / "ark-evaluation-observation.schema.json").read_text(encoding="utf-8"))
+        self.assertEqual(observation_schema["$defs"]["transportObject"]["properties"]["size_bytes"]["minimum"], 0)
 
 
 if __name__ == "__main__":

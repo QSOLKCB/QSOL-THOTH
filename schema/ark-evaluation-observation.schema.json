@@ -151,7 +151,7 @@
       "required": ["object_id", "size_bytes", "bytes_sha256"],
       "properties": {
         "object_id": {"$ref": "#/$defs/sha256"},
-        "size_bytes": {"type": "integer", "minimum": 1},
+        "size_bytes": {"type": "integer", "minimum": 0},
         "bytes_sha256": {"$ref": "#/$defs/sha256"}
       }
     },

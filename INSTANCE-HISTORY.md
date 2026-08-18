@@ -24,7 +24,7 @@ CAPSULE_PRESENT != CAPSULE_VERIFIED
 
 The same semantic role may appear in many snapshots. Each occurrence remains separately bound to its snapshot and exact capsule hash. Later instances do not overwrite earlier ones.
 
-Within one snapshot, role ids are unique and UTF-8 sorted. Several roles may name the same capsule file only when its hash and size metadata agree exactly.
+Within one snapshot, role ids are unique and UTF-8 sorted. Several roles may name the same capsule file only when its hash and size metadata agree exactly. Across the complete history, one capsule hash must always bind the same exact byte size, even when different basenames refer to it.
 
 ## Append-only check
 
@@ -37,7 +37,7 @@ python3 tools/instance_history.py check-append-only \
   --candidate new-history.json
 ```
 
-The append check validates both documents, rejects truncation, and requires every accepted base snapshot to remain byte-identical as the candidate's prefix.
+The append check validates both documents, rejects truncation, preserves `record_class`, and requires every accepted base snapshot to remain byte-identical as the candidate's prefix. A synthetic history therefore cannot be relabeled as accepted private execution during append validation.
 
 ```text
 SNAPSHOT_APPEND_ONLY != SOURCE_IMMUTABLE

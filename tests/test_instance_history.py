@@ -70,6 +70,13 @@ class InstanceHistoryTests(unittest.TestCase):
         with self.assertRaisesRegex(ContractError, "E_INSTANCE_APPEND_MUTATION"):
             history.check_append_only(self.value, candidate)
 
+    def test_append_only_check_rejects_record_class_relabeling(self):
+        candidate = copy.deepcopy(self.value)
+        candidate["record_class"] = "accepted-private-metadata"
+        rehash(candidate)
+        with self.assertRaisesRegex(ContractError, "E_INSTANCE_APPEND_RECORD_CLASS"):
+            history.check_append_only(self.value, candidate)
+
     def test_truncation_is_rejected(self):
         candidate = copy.deepcopy(self.value)
         candidate["snapshots"] = candidate["snapshots"][:1]
@@ -98,6 +105,27 @@ class InstanceHistoryTests(unittest.TestCase):
         rehash(changed)
         with self.assertRaisesRegex(ContractError, "E_INSTANCE_CAPSULE_CONFLICT"):
             history.validate_history(changed)
+
+    def test_one_capsule_hash_cannot_claim_conflicting_sizes(self):
+        for snapshot_index, instance_index in ((0, 1), (1, 0)):
+            with self.subTest(snapshot_index=snapshot_index, instance_index=instance_index):
+                changed = copy.deepcopy(self.value)
+                first = changed["snapshots"][0]["instances"][0]
+                conflicting = changed["snapshots"][snapshot_index]["instances"][instance_index]
+                conflicting["capsule_sha256"] = first["capsule_sha256"]
+                conflicting["size_bytes"] = first["size_bytes"] + 1
+                rehash(changed)
+                with self.assertRaisesRegex(ContractError, "E_INSTANCE_CAPSULE_CONFLICT"):
+                    history.validate_history(changed)
+
+    def test_record_class_non_string_fails_with_contract_error(self):
+        for invalid in ([], {}):
+            with self.subTest(invalid=invalid):
+                changed = copy.deepcopy(self.value)
+                changed["record_class"] = invalid
+                rehash(changed)
+                with self.assertRaisesRegex(ContractError, "E_INSTANCE_RECORD_CLASS"):
+                    history.validate_history(changed)
 
     def test_schema_is_closed_and_marks_synthetic_records(self):
         schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
