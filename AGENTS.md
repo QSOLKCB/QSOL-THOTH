@@ -12,7 +12,7 @@ QSOL-THOTH is a public routing protocol. Treat its public/private boundary as a 
 - Fail closed on ambiguity or unknown canonical ids.
 - Version semantic changes rather than silently changing the meaning of an existing CONCAP id.
 - Keep route selection, style selection, evidence admission, and factual authority as separate concepts.
-- Open PRs intended for Codex review Ready for review, not draft.
+- Open PRs intended for Codex review marked Ready for review, not draft.
 
 ## Forbidden behavior
 
