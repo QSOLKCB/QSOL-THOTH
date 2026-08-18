@@ -1,79 +1,87 @@
 {
-  "protocol": "QSOL-THOTH/CONCAP-REGISTRY/1",
-  "schema_version": "1.0.0",
-  "namespace": "CONCAP",
-  "expansion": "CONtext CAPsules",
-  "authority": "semantic-routing-only",
-  "capsules": [
-    {
-      "id": "concap.identity.core/1",
-      "order": 10,
-      "role": "minimum identity and continuity anchors",
-      "default_privacy": "RESTRICTED",
-      "epistemic_authority": "none-by-routing",
-      "style_authority": "none"
-    },
-    {
-      "id": "concap.workstyle.engineering/1",
-      "order": 20,
-      "role": "engineering and collaboration working preferences",
-      "default_privacy": "RESTRICTED",
-      "epistemic_authority": "none-by-routing",
-      "style_authority": "receiver-guidance"
-    },
-    {
-      "id": "concap.research.active/1",
-      "order": 30,
-      "role": "active research and project context",
-      "default_privacy": "RESTRICTED",
-      "epistemic_authority": "none-by-routing",
-      "style_authority": "none"
-    },
-    {
-      "id": "concap.receipts/1",
-      "order": 40,
-      "role": "provenance, release, commit, and verification receipts",
-      "default_privacy": "RESTRICTED",
-      "epistemic_authority": "none-by-routing",
-      "style_authority": "none"
-    },
-    {
-      "id": "concap.culture.core/1",
-      "order": 50,
-      "role": "general cultural and collaboration context",
-      "default_privacy": "RESTRICTED",
-      "epistemic_authority": "none-by-routing",
-      "style_authority": "receiver-guidance"
-    },
-    {
-      "id": "concap.culture.au-humour/1",
-      "order": 60,
-      "role": "Australian humour, understatement, irreverence, and banter guidance",
-      "default_privacy": "RESTRICTED",
-      "epistemic_authority": "none-by-routing",
-      "style_authority": "receiver-guidance"
-    },
-    {
-      "id": "concap.culture.comedy/1",
-      "order": 70,
-      "role": "authored comedy artifacts and comedic timing examples",
-      "default_privacy": "RESTRICTED",
-      "epistemic_authority": "none-by-routing",
-      "style_authority": "receiver-guidance"
-    },
-    {
-      "id": "concap.culture.music/1",
-      "order": 80,
-      "role": "music, sonification, and aesthetic preference context",
-      "default_privacy": "RESTRICTED",
-      "epistemic_authority": "none-by-routing",
-      "style_authority": "receiver-guidance"
-    }
-  ],
-  "boundaries": [
-    "CONCAP_ID != CAPSULE_BYTES",
-    "PUBLIC_ROUTE != PRIVATE_PAYLOAD",
-    "SELECTED != LOADED",
-    "LOADED != TRUE"
-  ]
+    "protocol": "QSOL-THOTH/CONCAP-REGISTRY/1",
+    "schema_version": "1.0.0",
+    "namespace": "CONCAP",
+    "expansion": "CONtext CAPsules",
+    "authority": "semantic-routing-only",
+    "capsules": [
+        {
+            "id": "concap.identity.core/1",
+            "order": 10,
+            "role": "minimum identity and continuity anchors",
+            "default_privacy": "RESTRICTED",
+            "epistemic_authority": "none-by-routing",
+            "style_authority": "none"
+        },
+        {
+            "id": "concap.workstyle.engineering/1",
+            "order": 20,
+            "role": "engineering and collaboration working preferences",
+            "default_privacy": "RESTRICTED",
+            "epistemic_authority": "none-by-routing",
+            "style_authority": "receiver-guidance"
+        },
+        {
+            "id": "concap.research.active/1",
+            "order": 30,
+            "role": "active research and project context",
+            "default_privacy": "RESTRICTED",
+            "epistemic_authority": "none-by-routing",
+            "style_authority": "none"
+        },
+        {
+            "id": "concap.receipts/1",
+            "order": 40,
+            "role": "provenance, release, commit, and verification receipts",
+            "default_privacy": "RESTRICTED",
+            "epistemic_authority": "none-by-routing",
+            "style_authority": "none"
+        },
+        {
+            "id": "concap.culture.core/1",
+            "order": 50,
+            "role": "general cultural and collaboration context",
+            "default_privacy": "RESTRICTED",
+            "epistemic_authority": "none-by-routing",
+            "style_authority": "receiver-guidance"
+        },
+        {
+            "id": "concap.culture.au-humour/1",
+            "order": 60,
+            "role": "Australian humour, understatement, irreverence, and banter guidance",
+            "default_privacy": "RESTRICTED",
+            "epistemic_authority": "none-by-routing",
+            "style_authority": "receiver-guidance"
+        },
+        {
+            "id": "concap.culture.comedy/1",
+            "order": 70,
+            "role": "authored comedy artifacts and comedic timing examples",
+            "default_privacy": "RESTRICTED",
+            "epistemic_authority": "none-by-routing",
+            "style_authority": "receiver-guidance"
+        },
+        {
+            "id": "concap.culture.music/1",
+            "order": 80,
+            "role": "music, sonification, and aesthetic preference context",
+            "default_privacy": "RESTRICTED",
+            "epistemic_authority": "none-by-routing",
+            "style_authority": "receiver-guidance"
+        },
+        {
+            "id": "concap.history.timeline/1",
+            "order": 90,
+            "role": "minimum-sufficient chronological anchors and declared historical reconstruction obligations",
+            "default_privacy": "RESTRICTED",
+            "epistemic_authority": "none-by-routing",
+            "style_authority": "none"
+        }
+    ],
+    "boundaries": [
+        "CONCAP_ID != CAPSULE_BYTES",
+        "PUBLIC_ROUTE != PRIVATE_PAYLOAD",
+        "SELECTED != LOADED",
+        "LOADED != TRUE"
+    ]
 }
