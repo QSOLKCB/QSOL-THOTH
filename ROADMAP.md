@@ -46,22 +46,23 @@
 ## Phase 5 — QSOL-CAPSULES instance history
 
 - [x] Define private role-to-capsule instance metadata without exposing payloads publicly.
-- [ ] Populate real accepted snapshots after capsule generation and fixed-point verification.
-- [ ] Support immutable historical instances of the same semantic CONCAP role across snapshots.
-- [ ] Bind accepted instances to exact source, generator, policy, and capsule hashes.
-- [ ] Preserve append-only snapshot semantics.
+- [x] Publish a strict public schema and validator for caller-supplied private instance-history metadata.
+- [ ] Populate real accepted snapshots after capsule generation and fixed-point verification. **Operational gate:** QSOL-CAPSULES currently contains no accepted `.dat` snapshot; THOTH ships only an explicitly `synthetic-conformance` fixture and does not claim execution.
+- [x] Support immutable historical instances of the same semantic CONCAP role across snapshots.
+- [x] Bind accepted instances to exact source commit, source projection, generator commit, policy, verification receipt, capsule hash, and byte size.
+- [x] Preserve append-only snapshot semantics with byte-identical prefix verification.
 
 ## Phase 6 — QSOL-ARK evaluation
 
-- [ ] Measure route sufficiency/minimality, style fidelity, factual accuracy, and historical reconstruction coverage separately.
-- [ ] Add clean-room tests where consumers receive only a portable bundle, never source-repository access.
-- [ ] Compare local-directory, archive, static-HTTP, and capability-relay transports for byte-identical resolved objects.
-- [ ] Add negative-space tests for style leakage, unsupported historical interpolation, and accidental private-source dependency.
-- [ ] Keep `STYLE_FIDELITY != FACTUAL_ACCURACY != PHYSICAL_TRUTH` explicit.
+- [x] Measure route sufficiency/minimality, style fidelity, factual accuracy, and historical reconstruction coverage separately.
+- [x] Add clean-room tests where consumers receive only a portable bundle, never source-repository access.
+- [x] Compare explicit local-directory, archive, static-HTTP, and capability-relay observations for byte-identical resolved objects.
+- [x] Add negative-space tests for style leakage, unsupported historical interpolation, and accidental private-source dependency.
+- [x] Keep `STYLE_FIDELITY != FACTUAL_ACCURACY != PHYSICAL_TRUTH` explicit and forbid aggregate truth scores.
 
 ## Phase 7 — Multi-turn ESS switching
 
-- [ ] Define deterministic style persistence, explicit transition events, optional demonstrated hysteresis/dwell rules, and replayable transition receipts.
+- [x] Define deterministic style persistence, explicit transition/reset events, immediate and demonstrated hysteresis/dwell profiles, effective-route rebuilding, and replayable chained transition receipts.
 
 ## Long-term invariants
 
@@ -82,4 +83,13 @@ RESOLUTION != TRANSPORT
 TRANSPORT != AUTHORITY
 OBJECT_IDENTITY != TRANSPORT_LOCATION
 MODEL_CAN_RECONSTRUCT_CONTEXT != MODEL_CAN_ACCESS_PRIVATE_SOURCE
+CLAIMED_EXECUTION != EXECUTED
+SYNTHETIC_CONFORMANCE != ACCEPTED_PRIVATE_SNAPSHOT
+INSTANCE_HISTORY != CAPSULE_BYTES
+SNAPSHOT_APPEND_ONLY != SOURCE_IMMUTABLE
+STYLE_FIDELITY != FACTUAL_ACCURACY != PHYSICAL_TRUTH
+ROUTE_SUFFICIENCY != ROUTE_MINIMALITY
+TRANSPORT_EQUIVALENCE != AUTHORITY
+STYLE_PERSISTENCE != EPISTEMIC_PERSISTENCE
+REPLAY_RECEIPT != HIDDEN_STATE
 ```

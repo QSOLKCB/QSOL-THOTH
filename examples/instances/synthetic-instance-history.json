@@ -1,0 +1,75 @@
+{
+  "protocol": "QSOL-CAPSULES/CONCAP-INSTANCE-HISTORY/1",
+  "schema_version": "1.0.0",
+  "record_class": "synthetic-conformance",
+  "authority": "private-instance-metadata-only",
+  "snapshots": [
+    {
+      "snapshot_id": "sha256:c537fd89c14fed0dca8a54c42345a41ea9d04fec0b8953866ef0dc39c421dfb9",
+      "sequence": 1,
+      "predecessor_snapshot_id": null,
+      "acceptance_status": "accepted",
+      "source_commit": "1111111111111111111111111111111111111111",
+      "source_projection_sha256": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+      "generator_commit": "2222222222222222222222222222222222222222",
+      "policy_sha256": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+      "verification_receipt_sha256": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+      "instances": [
+        {
+          "role_id": "concap.identity.core/1",
+          "capsule_name": "identity.dat",
+          "capsule_sha256": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+          "size_bytes": 128,
+          "container": "qsol-restore-dat/1",
+          "fixed_point_verified": true
+        },
+        {
+          "role_id": "concap.workstyle.engineering/1",
+          "capsule_name": "working-style.dat",
+          "capsule_sha256": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+          "size_bytes": 192,
+          "container": "qsol-restore-dat/1",
+          "fixed_point_verified": true
+        }
+      ]
+    },
+    {
+      "snapshot_id": "sha256:77706de57abfb50b94ecdbbeb6a3e3e4c66ca42a6bad8d9f0b1120d866c7f39d",
+      "sequence": 2,
+      "predecessor_snapshot_id": "sha256:c537fd89c14fed0dca8a54c42345a41ea9d04fec0b8953866ef0dc39c421dfb9",
+      "acceptance_status": "accepted",
+      "source_commit": "8888888888888888888888888888888888888888",
+      "source_projection_sha256": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "generator_commit": "9999999999999999999999999999999999999999",
+      "policy_sha256": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "verification_receipt_sha256": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "instances": [
+        {
+          "role_id": "concap.identity.core/1",
+          "capsule_name": "identity.dat",
+          "capsule_sha256": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+          "size_bytes": 144,
+          "container": "qsol-restore-dat/1",
+          "fixed_point_verified": true
+        },
+        {
+          "role_id": "concap.workstyle.engineering/1",
+          "capsule_name": "working-style.dat",
+          "capsule_sha256": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          "size_bytes": 208,
+          "container": "qsol-restore-dat/1",
+          "fixed_point_verified": true
+        }
+      ]
+    }
+  ],
+  "boundaries": [
+    "INSTANCE_HISTORY != CAPSULE_BYTES",
+    "ACCEPTED_METADATA != FACTUAL_AUTHORITY",
+    "CAPSULE_PRESENT != CAPSULE_VERIFIED",
+    "SNAPSHOT_APPEND_ONLY != SOURCE_IMMUTABLE",
+    "HISTORICAL_INSTANCE != CURRENT_INSTANCE",
+    "MODEL_CAN_LOAD_EXPORT != MODEL_CAN_ACCESS_CAPSULE_REPOSITORY"
+  ],
+  "history_id": "sha256:340479223283a797f946d84bb4d76ccc6b601a6aa80c659ccb5096ef3fa79c49"
+}

@@ -2,13 +2,13 @@
 
 ## Role
 
-QSOL-THOTH is the public deterministic control plane between semantic context requirements and private capsule resolution.
+QSOL-THOTH is the public deterministic control plane between semantic context requirements, portable object resolution, explicit receiver-style state, and recovery conformance.
 
-It answers one narrow question:
+Its canonical router answers one narrow question:
 
 > Given an explicit task intent and optional explicit receiver style, which versioned CONCAP roles should be requested, and which ESS style state should be applied?
 
-It does not answer whether the requested private capsules exist, whether their contents are true, or whether a recovery succeeded.
+Separate THOTH side contracts can validate caller-supplied instance metadata, replay explicit multi-turn style events, and receipt structured ARK observations. None of those contracts answers whether private capsules actually exist, whether their contents are true, or whether a recovery succeeded.
 
 ## Layer separation
 
@@ -17,28 +17,28 @@ QSOL-CONTEXT
   canonical source authority
         |
         v
-CONCAP
-  public semantic role namespace
+QSOL-CONTROL
+  deterministic export / byte operations
+        |
+        v
+portable CONCAP bundle
+  explicit immutable objects
         |
         v
 QSOL-THOTH
-  route + ESS style decision
+  route + resolve + replay public contracts
         |
         v
-private resolver
-  role -> concrete instance mapping
-        |
-        v
-QSOL-CONTROL
-  deterministic byte operations
-        |
-        v
-QSOL-CAPSULES
-  immutable private artifact store
+consumer
         |
         v
 QSOL-ARK
-  clean-room recovery evaluation
+  clean-room recovery evaluation authority
+
+QSOL-CAPSULES
+  private immutable artifact store
+        |
+        +-- supplies explicit private instance metadata when authorized
 ```
 
 ### Authority ownership
@@ -47,7 +47,7 @@ QSOL-ARK
 |---|---|---|
 | QSOL-CONTEXT | canonical context records | generated capsule identity |
 | CONCAP | semantic role ids | concrete bytes |
-| QSOL-THOTH | deterministic role/style selection | factual truth or private availability |
+| QSOL-THOTH | deterministic role/style selection, portable resolution, session replay, conformance receipts | factual truth, private availability, or ARK evaluation authority |
 | QSOL-CONTROL | pack/unpack/verify implementation | context truth |
 | QSOL-CAPSULES | private immutable artifact instances | canonical factual authority |
 | QSOL-ARK | recovery evaluation | source authorship |
@@ -118,6 +118,40 @@ creative
 australian_humour
 ```
 
+## Multi-turn ESS sessions
+
+The one-turn router remains unchanged. `QSOL-THOTH/ESS-SESSION/1` adds an explicit event log above it.
+
+- the first route uses its declared default style;
+- a current style persists across later route events;
+- the effective route is rebuilt with that style so its support CONCAPs are selected correctly;
+- only explicit transition/reset events change session state;
+- optional dwell and hysteresis count declared events, not time;
+- every event receipt is chained to the previous receipt.
+
+```text
+STYLE_PERSISTENCE != EPISTEMIC_PERSISTENCE
+REPLAY_RECEIPT != HIDDEN_STATE
+```
+
+## Instance-history validation
+
+`QSOL-CAPSULES/CONCAP-INSTANCE-HISTORY/1` is caller-supplied private metadata. THOTH validates content-addressed snapshot chains, exact source/generator/policy/capsule bindings, historical role instances, and append-only prefixes. THOTH neither discovers nor stores the underlying private bytes.
+
+```text
+INSTANCE_HISTORY != CAPSULE_BYTES
+SYNTHETIC_CONFORMANCE != ACCEPTED_PRIVATE_SNAPSHOT
+```
+
+## ARK evaluation receipts
+
+QSOL-ARK retains evaluation authority. THOTH's evaluator deterministically counts explicit observations across separate dimensions, enforces portable-only clean-room declarations, compares transport object observations, and rejects negative-space violations. It emits no aggregate truth score.
+
+```text
+STYLE_FIDELITY != FACTUAL_ACCURACY != PHYSICAL_TRUTH
+MEASURED_OBSERVATION != AUTOMATIC_TRUTH
+```
+
 ## Style and epistemics
 
 Receiver support can influence phrasing, pacing, examples, humour, formatting, and collaboration tone.
@@ -135,7 +169,7 @@ A technically reviewed claim remains subject to the same provenance requirements
 
 ## Minimal disclosure principle
 
-THOTH emits semantic role ids only. It does not enumerate private files or inspect QSOL-CAPSULES.
+Canonical routing emits semantic role ids only. It does not enumerate private files or inspect QSOL-CAPSULES. The separate instance-history validator reads only the explicit metadata file supplied by its caller and never performs repository discovery.
 
 This makes route decisions publicly auditable while private resolution remains private.
 
@@ -144,4 +178,4 @@ PUBLIC_ROUTE != PRIVATE_PAYLOAD
 ROUTE_DECISION != CAPSULE_AVAILABILITY
 ```
 
-Future private resolvers should consume a route decision plus an explicit availability map and emit their own separately hashed resolution receipt.
+Portable resolution consumes a route decision plus an explicit object index and emits its own separately hashed receipt.

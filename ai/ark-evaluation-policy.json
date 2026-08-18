@@ -1,0 +1,59 @@
+{
+  "protocol": "QSOL-THOTH/ARK-EVALUATION-POLICY/1",
+  "schema_version": "1.0.0",
+  "authority": "measurement-contract-only",
+  "dimensions": [
+    {
+      "id": "route_sufficiency",
+      "order": 10,
+      "measurement": "selected_required_roles_over_declared_required_roles"
+    },
+    {
+      "id": "route_minimality",
+      "order": 20,
+      "measurement": "selected_justified_roles_over_all_selected_roles"
+    },
+    {
+      "id": "style_fidelity",
+      "order": 30,
+      "measurement": "passed_over_assessed_style_obligations"
+    },
+    {
+      "id": "factual_accuracy",
+      "order": 40,
+      "measurement": "correct_over_assessed_claims"
+    },
+    {
+      "id": "historical_reconstruction_coverage",
+      "order": 50,
+      "measurement": "covered_over_assessed_retention_obligations"
+    }
+  ],
+  "transport_profiles": [
+    "local-directory",
+    "archive",
+    "static-http",
+    "capability-relay"
+  ],
+  "clean_room_requirements": {
+    "portable_inputs_only": true,
+    "private_source_repository_access": false,
+    "private_context_connector_access": false,
+    "hidden_provider_memory_dependency": false
+  },
+  "negative_space_checks": [
+    "style_leakage",
+    "unsupported_historical_interpolation",
+    "accidental_private_source_dependency"
+  ],
+  "aggregation": "forbidden-keep-dimensions-separate",
+  "boundaries": [
+    "STYLE_FIDELITY != FACTUAL_ACCURACY != PHYSICAL_TRUTH",
+    "ROUTE_SUFFICIENCY != ROUTE_MINIMALITY",
+    "HISTORICAL_COVERAGE != HISTORICAL_TRUTH",
+    "TRANSPORT_EQUIVALENCE != AUTHORITY",
+    "CLEAN_ROOM_SUCCESS != PRIVATE_SOURCE_ACCESS",
+    "MEASURED_OBSERVATION != AUTOMATIC_TRUTH",
+    "AGGREGATE_SCORE = FORBIDDEN"
+  ]
+}

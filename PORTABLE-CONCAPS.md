@@ -184,6 +184,8 @@ MODEL_HAS_CAPABILITY != MODEL_HAS_REPOSITORY_ACCESS
 
 This means the same bundle contract can be implemented later by a local HTTP service, object store, signed URL service, or another broker without changing the semantic routing protocol.
 
+`tools/ark_evaluation.py` compares explicit local-directory, archive, static-HTTP, and capability-relay object observations. All profiles must report the same content-addressed ids, sizes, and exact byte hashes. This tests transport equivalence without making transport part of canonical identity or authority. See `ARK-EVALUATION.md`.
+
 ## Core invariant
 
 ```text

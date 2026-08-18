@@ -1,0 +1,118 @@
+{
+  "protocol": "QSOL-ARK/THOTH-EVALUATION-OBSERVATION/1",
+  "schema_version": "1.0.0",
+  "trial_id": "synthetic_clean_room",
+  "assessment_authority": "explicit-observations-not-automatic-truth",
+  "route": {
+    "selected_role_ids": [
+      "concap.identity.core/1",
+      "concap.workstyle.engineering/1"
+    ],
+    "required_role_ids": [
+      "concap.identity.core/1",
+      "concap.workstyle.engineering/1"
+    ],
+    "justified_role_ids": [
+      "concap.identity.core/1",
+      "concap.workstyle.engineering/1"
+    ]
+  },
+  "style_fidelity": {
+    "obligations": [
+      {
+        "id": "compact_engineering_delivery",
+        "outcome": "pass"
+      },
+      {
+        "id": "receiver_style_preserved",
+        "outcome": "pass"
+      }
+    ]
+  },
+  "factual_accuracy": {
+    "claims": [
+      {
+        "id": "identity_claim",
+        "outcome": "correct"
+      },
+      {
+        "id": "unverified_optional_claim",
+        "outcome": "unverified"
+      }
+    ]
+  },
+  "historical_reconstruction": {
+    "obligations": [
+      {
+        "id": "chronology_anchor",
+        "outcome": "covered"
+      },
+      {
+        "id": "unsupported_gap",
+        "outcome": "unverified"
+      }
+    ]
+  },
+  "clean_room": {
+    "portable_inputs_only": true,
+    "private_source_repository_access": false,
+    "private_context_connector_access": false,
+    "hidden_provider_memory_dependency": false
+  },
+  "transports": [
+    {
+      "id": "local-directory",
+      "objects": [
+        {
+          "object_id": "sha256:a0fdabb69f7356bacd8a68d5bdfb2a41bf5ef578e48021119dbb5d08fb80af69",
+          "size_bytes": 59,
+          "bytes_sha256": "sha256:a0fdabb69f7356bacd8a68d5bdfb2a41bf5ef578e48021119dbb5d08fb80af69"
+        }
+      ]
+    },
+    {
+      "id": "archive",
+      "objects": [
+        {
+          "object_id": "sha256:a0fdabb69f7356bacd8a68d5bdfb2a41bf5ef578e48021119dbb5d08fb80af69",
+          "size_bytes": 59,
+          "bytes_sha256": "sha256:a0fdabb69f7356bacd8a68d5bdfb2a41bf5ef578e48021119dbb5d08fb80af69"
+        }
+      ]
+    },
+    {
+      "id": "static-http",
+      "objects": [
+        {
+          "object_id": "sha256:a0fdabb69f7356bacd8a68d5bdfb2a41bf5ef578e48021119dbb5d08fb80af69",
+          "size_bytes": 59,
+          "bytes_sha256": "sha256:a0fdabb69f7356bacd8a68d5bdfb2a41bf5ef578e48021119dbb5d08fb80af69"
+        }
+      ]
+    },
+    {
+      "id": "capability-relay",
+      "objects": [
+        {
+          "object_id": "sha256:a0fdabb69f7356bacd8a68d5bdfb2a41bf5ef578e48021119dbb5d08fb80af69",
+          "size_bytes": 59,
+          "bytes_sha256": "sha256:a0fdabb69f7356bacd8a68d5bdfb2a41bf5ef578e48021119dbb5d08fb80af69"
+        }
+      ]
+    }
+  ],
+  "negative_space": {
+    "style_leakage": false,
+    "unsupported_historical_interpolation": false,
+    "accidental_private_source_dependency": false
+  },
+  "boundaries": [
+    "STYLE_FIDELITY != FACTUAL_ACCURACY != PHYSICAL_TRUTH",
+    "ROUTE_SUFFICIENCY != ROUTE_MINIMALITY",
+    "HISTORICAL_COVERAGE != HISTORICAL_TRUTH",
+    "TRANSPORT_EQUIVALENCE != AUTHORITY",
+    "CLEAN_ROOM_SUCCESS != PRIVATE_SOURCE_ACCESS",
+    "MEASURED_OBSERVATION != AUTOMATIC_TRUTH",
+    "AGGREGATE_SCORE = FORBIDDEN"
+  ]
+}
