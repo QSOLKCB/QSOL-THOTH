@@ -1,0 +1,7 @@
+{
+  "protocol": "QSOL-THOTH/NEGATIVE-VECTOR/1",
+  "id": "ambiguous_router_alias",
+  "case": "router_ambiguous_alias",
+  "expected_error": "E_ROUTER_AMBIGUOUS_TOKEN",
+  "parameters": {}
+}

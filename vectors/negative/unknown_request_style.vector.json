@@ -1,0 +1,9 @@
+{
+  "protocol": "QSOL-THOTH/NEGATIVE-VECTOR/1",
+  "id": "unknown_request_style",
+  "case": "request_unknown_style",
+  "expected_error": "E_ROUTE_UNKNOWN_STYLE",
+  "parameters": {
+    "style": "surprise_pirate"
+  }
+}

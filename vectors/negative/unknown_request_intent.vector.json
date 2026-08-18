@@ -1,0 +1,9 @@
+{
+  "protocol": "QSOL-THOTH/NEGATIVE-VECTOR/1",
+  "id": "unknown_request_intent",
+  "case": "request_unknown_intent",
+  "expected_error": "E_ROUTE_UNKNOWN_INTENT",
+  "parameters": {
+    "intent": "definitely_not_a_route"
+  }
+}

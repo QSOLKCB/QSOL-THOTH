@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.invalid/schemas/thoth-concap-compatibility-v1.json",
+  "title": "QSOL-THOTH CONCAP Compatibility Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol",
+    "schema_version",
+    "role_versioning",
+    "allowed_in_place_changes",
+    "requires_new_role_version",
+    "boundaries"
+  ],
+  "properties": {
+    "protocol": {
+      "const": "QSOL-THOTH/CONCAP-COMPATIBILITY/1"
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*\\.[0-9]+\\.[0-9]+$"
+    },
+    "role_versioning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id_pattern",
+        "semantic_change_requires_new_version",
+        "existing_version_semantics_immutable",
+        "new_version_backward_compatible_by_default",
+        "implicit_version_substitution",
+        "resolver_must_match_exact_declared_role_id"
+      ],
+      "properties": {
+        "id_pattern": {
+          "const": "^concap\\.[a-z0-9_.-]+/[1-9][0-9]*$"
+        },
+        "semantic_change_requires_new_version": {
+          "const": true
+        },
+        "existing_version_semantics_immutable": {
+          "const": true
+        },
+        "new_version_backward_compatible_by_default": {
+          "const": false
+        },
+        "implicit_version_substitution": {
+          "const": false
+        },
+        "resolver_must_match_exact_declared_role_id": {
+          "const": true
+        }
+      }
+    },
+    "allowed_in_place_changes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "requires_new_role_version": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "boundaries": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  }
+}

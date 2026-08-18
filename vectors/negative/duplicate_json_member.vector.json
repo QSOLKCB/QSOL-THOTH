@@ -1,0 +1,9 @@
+{
+  "protocol": "QSOL-THOTH/NEGATIVE-VECTOR/1",
+  "id": "duplicate_json_member",
+  "case": "raw_request_file",
+  "expected_error": "E_JSON_DUPLICATE_MEMBER",
+  "parameters": {
+    "fixture": "vectors/negative/fixtures/duplicate-json-member.request.json"
+  }
+}

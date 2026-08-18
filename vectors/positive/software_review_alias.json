@@ -1,0 +1,31 @@
+{
+  "protocol": "QSOL-THOTH/POSITIVE-VECTOR/1",
+  "id": "software_review_alias",
+  "request": {
+    "protocol": "QSOL-THOTH/ROUTE-REQUEST/1",
+    "intent": "code_review"
+  },
+  "expected_decision": {
+    "protocol": "QSOL-THOTH/ROUTE-DECISION/1",
+    "canonical_intent": "software_review",
+    "style": "technical",
+    "concaps": [
+      "concap.identity.core/1",
+      "concap.workstyle.engineering/1",
+      "concap.receipts/1"
+    ],
+    "request_sha256": "sha256:2afa25dc839623e3df9432968e04ebfa3ef1d90ae9f6cc6a6acbec394e08530b",
+    "configuration_sha256": "sha256:851bb53d22ebd061ab2d846bfa9e42546df0790def04130d14a4e63ffcf4df09",
+    "implementation_sha256": "sha256:d1a913877e10841c153a600e4f08a540e2487175b9e08c0781b3d157d270b928",
+    "boundaries": [
+      "ROUTING != FACTUAL_AUTHORITY",
+      "STYLE_SWITCH != EPISTEMIC_SWITCH",
+      "STYLE_SUPPORT != EVIDENCE",
+      "CONCAP_ID != CAPSULE_BYTES",
+      "ROUTE_DECISION != CAPSULE_AVAILABILITY",
+      "SELECTED != LOADED",
+      "LOADED != TRUE"
+    ],
+    "decision_sha256": "sha256:819c618898ff1e94422680fa57613f294158556b03bbe578e5ce495d8639772a"
+  }
+}

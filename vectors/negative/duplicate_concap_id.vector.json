@@ -1,0 +1,7 @@
+{
+  "protocol": "QSOL-THOTH/NEGATIVE-VECTOR/1",
+  "id": "duplicate_concap_id",
+  "case": "registry_duplicate_id",
+  "expected_error": "E_REGISTRY_DUPLICATE_ID",
+  "parameters": {}
+}

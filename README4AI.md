@@ -7,12 +7,18 @@ It does not contain private user context or capsule payload bytes.
 ## Load order
 
 1. `ai/concap-registry.json`
-2. `ai/ess-style-machine.json`
-3. `ai/router.json`
-4. `schema/route-request.schema.json`
-5. `schema/route-decision.schema.json`
-6. `tools/thoth.py`
-7. `README.md`
+2. `ai/concap-compatibility.json`
+3. `ai/ess-style-machine.json`
+4. `ai/router.json`
+5. `schema/concap-registry.schema.json`
+6. `schema/concap-compatibility.schema.json`
+7. `schema/ess-style-machine.schema.json`
+8. `schema/router.schema.json`
+9. `schema/route-request.schema.json`
+10. `schema/route-decision.schema.json`
+11. `CONFORMANCE.md`
+12. `tools/thoth.py`
+13. `README.md`
 
 ## Core interpretation
 
@@ -38,6 +44,32 @@ Do not reinterpret CONCAP ids as actual capsule bytes.
 - De-duplicate selected CONCAP ids.
 - Order selected CONCAP ids by `ai/concap-registry.json#capsules[].order`.
 - Do not use fuzzy matching, embeddings, wall-clock state, random input, or network state in canonical routing.
+
+## CONCAP versioning
+
+CONCAP role ids are versioned semantic identities.
+
+```text
+EXISTING_ROLE_VERSION => SEMANTICS_IMMUTABLE
+SEMANTIC_CHANGE => NEW_ROLE_VERSION
+NEW_ROLE_VERSION != BACKWARD_COMPATIBLE_BY_DEFAULT
+```
+
+Never silently substitute another version. Read `ai/concap-compatibility.json`.
+
+## Conformance
+
+Before changing routing semantics, run:
+
+```bash
+python3 tools/thoth.py validate
+python3 tools/thoth.py conformance
+python3 -m unittest discover -s tests -v
+```
+
+Positive vectors freeze complete route decisions. Negative vectors freeze stable error codes.
+
+Do not regenerate expected receipts merely to make CI green. A changed known-answer receipt is a semantic review event.
 
 ## Authority boundaries
 
@@ -79,14 +111,7 @@ DECISION_RECEIPT != SELF_HASH_INPUT
 
 Never add real private capsule payloads, secrets, credentials, provider-private state, hidden reasoning, or private context records to QSOL-THOTH.
 
-Public synthetic examples are allowed.
-
-## Validation
-
-```bash
-python3 tools/thoth.py validate
-python3 -m unittest discover -s tests -v
-```
+Public synthetic examples and known-answer vectors are allowed.
 
 ## Review workflow
 

@@ -17,12 +17,14 @@
 
 ## Phase 1 — Public CONCAP contract hardening
 
-- [ ] Add machine-readable role schema for `ai/concap-registry.json`.
-- [ ] Add machine-readable ESS state-machine schema.
-- [ ] Add machine-readable router schema.
-- [ ] Add canonical known-answer route vectors with frozen expected receipts.
-- [ ] Add negative vectors for ambiguous aliases, duplicate ids, duplicate JSON members, and unknown support CONCAPs.
-- [ ] Add a versioned compatibility policy for CONCAP role evolution.
+- [x] Add machine-readable role schema for `ai/concap-registry.json`.
+- [x] Add machine-readable ESS state-machine schema.
+- [x] Add machine-readable router schema.
+- [x] Add canonical known-answer route vectors with frozen expected receipts.
+- [x] Add negative vectors for ambiguous aliases, duplicate ids, duplicate JSON members, and unknown support CONCAPs.
+- [x] Add stable machine error codes for conformance failures.
+- [x] Add a versioned compatibility policy for CONCAP role evolution.
+- [x] Add `python3 tools/thoth.py conformance` and replay it in CI.
 
 ## Phase 2 — Canonical source bindings
 

@@ -1,0 +1,31 @@
+{
+  "protocol": "QSOL-THOTH/POSITIVE-VECTOR/1",
+  "id": "formal_claim_default",
+  "request": {
+    "protocol": "QSOL-THOTH/ROUTE-REQUEST/1",
+    "intent": "formal_claim"
+  },
+  "expected_decision": {
+    "protocol": "QSOL-THOTH/ROUTE-DECISION/1",
+    "canonical_intent": "formal_claim",
+    "style": "formal",
+    "concaps": [
+      "concap.workstyle.engineering/1",
+      "concap.research.active/1",
+      "concap.receipts/1"
+    ],
+    "request_sha256": "sha256:1b93ff2535904bf6ba7e3c82f388efa5fe91d13afcef516c2d95e7c1d014d26d",
+    "configuration_sha256": "sha256:851bb53d22ebd061ab2d846bfa9e42546df0790def04130d14a4e63ffcf4df09",
+    "implementation_sha256": "sha256:d1a913877e10841c153a600e4f08a540e2487175b9e08c0781b3d157d270b928",
+    "boundaries": [
+      "ROUTING != FACTUAL_AUTHORITY",
+      "STYLE_SWITCH != EPISTEMIC_SWITCH",
+      "STYLE_SUPPORT != EVIDENCE",
+      "CONCAP_ID != CAPSULE_BYTES",
+      "ROUTE_DECISION != CAPSULE_AVAILABILITY",
+      "SELECTED != LOADED",
+      "LOADED != TRUE"
+    ],
+    "decision_sha256": "sha256:31d061833e5ada4f7894065874d996abc52d4860d7e4d987394fb2d58dff9e61"
+  }
+}
