@@ -1,31 +1,6 @@
 {
-  "protocol": "QSOL-THOTH/POSITIVE-VECTOR/1",
-  "id": "comedy_default",
-  "request": {
-    "protocol": "QSOL-THOTH/ROUTE-REQUEST/1",
-    "intent": "comedy"
-  },
-  "expected_decision": {
-    "protocol": "QSOL-THOTH/ROUTE-DECISION/1",
-    "canonical_intent": "comedy",
-    "style": "australian_humour",
-    "concaps": [
-      "concap.culture.core/1",
-      "concap.culture.au-humour/1",
-      "concap.culture.comedy/1"
-    ],
-    "request_sha256": "sha256:482fcc379b27737cc6cf5c43df148cf1ac60d64cd663b5d6717588ce938c4078",
-    "configuration_sha256": "sha256:851bb53d22ebd061ab2d846bfa9e42546df0790def04130d14a4e63ffcf4df09",
-    "implementation_sha256": "sha256:e544c752642da66dab67e781d23d4926d21e6c3d6b4d3a353d183ba961e75f67",
-    "boundaries": [
-      "ROUTING != FACTUAL_AUTHORITY",
-      "STYLE_SWITCH != EPISTEMIC_SWITCH",
-      "STYLE_SUPPORT != EVIDENCE",
-      "CONCAP_ID != CAPSULE_BYTES",
-      "ROUTE_DECISION != CAPSULE_AVAILABILITY",
-      "SELECTED != LOADED",
-      "LOADED != TRUE"
-    ],
-    "decision_sha256": "sha256:8d7a46d414b4d02634862629c682dfb9d89e2dc1d78cb681322355523b87f695"
-  }
+  "protocol":"QSOL-THOTH/POSITIVE-VECTOR/1",
+  "id":"comedy_default",
+  "request":{"protocol":"QSOL-THOTH/ROUTE-REQUEST/1","intent":"comedy"},
+  "expected_decision":{"protocol":"QSOL-THOTH/ROUTE-DECISION/1","canonical_intent":"comedy","style":"australian_humour","concaps":["concap.culture.core/1","concap.culture.au-humour/1","concap.culture.comedy/1"],"request_sha256":"sha256:482fcc379b27737cc6cf5c43df148cf1ac60d64cd663b5d6717588ce938c4078","configuration_sha256":"sha256:899b7c355cdd19bd2b7d33cfa5dfeef4c1a3f4023a75af804db4d3afd7b90c67","implementation_sha256":"sha256:e544c752642da66dab67e781d23d4926d21e6c3d6b4d3a353d183ba961e75f67","boundaries":["ROUTING != FACTUAL_AUTHORITY","STYLE_SWITCH != EPISTEMIC_SWITCH","STYLE_SUPPORT != EVIDENCE","CONCAP_ID != CAPSULE_BYTES","ROUTE_DECISION != CAPSULE_AVAILABILITY","SELECTED != LOADED","LOADED != TRUE"],"decision_sha256":"sha256:53d2ea102a17443f3d8620a4dd49fc1b14cebb43f0c79e1cb0b9571fcb87a329"}
 }
