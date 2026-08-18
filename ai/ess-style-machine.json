@@ -1,0 +1,75 @@
+{
+  "protocol": "QSOL-THOTH/ESS-STYLE/1",
+  "schema_version": "1.0.0",
+  "selection": {
+    "explicit_declared_style_wins": true,
+    "otherwise_use_route_default": true,
+    "unknown_style_policy": "fail_closed",
+    "tie_break": "none-required-exact-token-selection"
+  },
+  "states": [
+    {
+      "id": "neutral",
+      "order": 10,
+      "receiver_role": "plain neutral delivery",
+      "support_concaps": []
+    },
+    {
+      "id": "technical",
+      "order": 20,
+      "receiver_role": "compact engineering and implementation delivery",
+      "support_concaps": [
+        "concap.workstyle.engineering/1"
+      ]
+    },
+    {
+      "id": "formal",
+      "order": 30,
+      "receiver_role": "formal definitions, invariants, proof and claim-boundary delivery",
+      "support_concaps": [
+        "concap.workstyle.engineering/1"
+      ]
+    },
+    {
+      "id": "research",
+      "order": 40,
+      "receiver_role": "research synthesis with explicit provenance and uncertainty",
+      "support_concaps": [
+        "concap.workstyle.engineering/1"
+      ]
+    },
+    {
+      "id": "creative",
+      "order": 50,
+      "receiver_role": "creative generation constrained by explicit artifact boundaries",
+      "support_concaps": [
+        "concap.culture.core/1"
+      ]
+    },
+    {
+      "id": "australian_humour",
+      "order": 60,
+      "receiver_role": "Australian humour, irreverence, understatement, escalation, and callback timing",
+      "support_concaps": [
+        "concap.culture.core/1",
+        "concap.culture.au-humour/1",
+        "concap.culture.comedy/1"
+      ]
+    }
+  ],
+  "transition_contract": {
+    "canonical_input": "declared request intent plus optional explicit style token",
+    "model_inferred_style_switching": false,
+    "wall_clock_input": false,
+    "random_input": false,
+    "network_input": false,
+    "style_chatter_prevention": "style remains fixed for one route decision unless a new explicit request is routed"
+  },
+  "boundaries": [
+    "STYLE_SWITCH != EPISTEMIC_SWITCH",
+    "STYLE != TRUTH",
+    "STYLE != CLAIM_CLASS",
+    "STYLE_SUPPORT != EVIDENCE",
+    "RECEIVER_STYLE != CANONICAL_CONTEXT"
+  ]
+}
