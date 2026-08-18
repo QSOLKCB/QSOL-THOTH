@@ -37,7 +37,7 @@ jobs:
       - name: Replay CONCAP conformance suite
         run: python3 tools/thoth.py conformance
 
-      - name: Validate portable CONCAP bindings and schemas
+      - name: Validate portable CONCAP bindings and schema semantics
         run: |
           python3 tools/concap_resolver.py validate-bindings
           python3 -m json.tool ai/concap-source-bindings.json >/dev/null
@@ -45,6 +45,7 @@ jobs:
           python3 -m json.tool schema/concap-object-index.schema.json >/dev/null
           python3 -m json.tool schema/concap-bootstrap.schema.json >/dev/null
           python3 -m json.tool schema/concap-resolution-receipt.schema.json >/dev/null
+          python3 -m unittest tests.test_concap_schema -v
 
       - name: Run unit tests
         run: python3 -m unittest discover -s tests -v
