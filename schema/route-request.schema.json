@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.invalid/schemas/thoth-route-request-v1.json",
+  "title": "QSOL-THOTH Route Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol", "intent"],
+  "properties": {
+    "protocol": {
+      "const": "QSOL-THOTH/ROUTE-REQUEST/1"
+    },
+    "intent": {
+      "type": "string",
+      "pattern": "^[a-z0-9_.-]+$",
+      "minLength": 1
+    },
+    "style": {
+      "type": "string",
+      "pattern": "^[a-z0-9_.-]+$",
+      "minLength": 1
+    }
+  }
+}
