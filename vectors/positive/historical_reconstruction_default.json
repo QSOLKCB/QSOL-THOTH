@@ -1,0 +1,6 @@
+{
+  "protocol":"QSOL-THOTH/POSITIVE-VECTOR/1",
+  "id":"historical_reconstruction_default",
+  "request":{"protocol":"QSOL-THOTH/ROUTE-REQUEST/1","intent":"historical_reconstruction"},
+  "expected_decision":{"protocol":"QSOL-THOTH/ROUTE-DECISION/1","canonical_intent":"historical_reconstruction","style":"research","concaps":["concap.workstyle.engineering/1","concap.receipts/1","concap.history.timeline/1"],"request_sha256":"sha256:57a873e8f5a4f58be69008d71ce59716cbb97553e8d8417f1b50dbe455bfecac","configuration_sha256":"sha256:899b7c355cdd19bd2b7d33cfa5dfeef4c1a3f4023a75af804db4d3afd7b90c67","implementation_sha256":"sha256:e544c752642da66dab67e781d23d4926d21e6c3d6b4d3a353d183ba961e75f67","boundaries":["ROUTING != FACTUAL_AUTHORITY","STYLE_SWITCH != EPISTEMIC_SWITCH","STYLE_SUPPORT != EVIDENCE","CONCAP_ID != CAPSULE_BYTES","ROUTE_DECISION != CAPSULE_AVAILABILITY","SELECTED != LOADED","LOADED != TRUE"],"decision_sha256":"sha256:3ae40d5892937aae1b2b99b7021959eab93e3669b203c7ff7db551c9c79ff4b6"}
+}
