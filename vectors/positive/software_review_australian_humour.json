@@ -1,0 +1,35 @@
+{
+  "protocol": "QSOL-THOTH/POSITIVE-VECTOR/1",
+  "id": "software_review_australian_humour",
+  "request": {
+    "protocol": "QSOL-THOTH/ROUTE-REQUEST/1",
+    "intent": "software_review",
+    "style": "australian_humour"
+  },
+  "expected_decision": {
+    "protocol": "QSOL-THOTH/ROUTE-DECISION/1",
+    "canonical_intent": "software_review",
+    "style": "australian_humour",
+    "concaps": [
+      "concap.identity.core/1",
+      "concap.workstyle.engineering/1",
+      "concap.receipts/1",
+      "concap.culture.core/1",
+      "concap.culture.au-humour/1",
+      "concap.culture.comedy/1"
+    ],
+    "request_sha256": "sha256:fd7465548b21cb00365d275831384eaf1cf998bbd5dd2dcdb03b9ed36a44b703",
+    "configuration_sha256": "sha256:851bb53d22ebd061ab2d846bfa9e42546df0790def04130d14a4e63ffcf4df09",
+    "implementation_sha256": "sha256:e544c752642da66dab67e781d23d4926d21e6c3d6b4d3a353d183ba961e75f67",
+    "boundaries": [
+      "ROUTING != FACTUAL_AUTHORITY",
+      "STYLE_SWITCH != EPISTEMIC_SWITCH",
+      "STYLE_SUPPORT != EVIDENCE",
+      "CONCAP_ID != CAPSULE_BYTES",
+      "ROUTE_DECISION != CAPSULE_AVAILABILITY",
+      "SELECTED != LOADED",
+      "LOADED != TRUE"
+    ],
+    "decision_sha256": "sha256:334e7c88368bbccfc973bbd107c92bb34d0635fbda451d312d5cf89e76b4e3c5"
+  }
+}

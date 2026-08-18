@@ -1,0 +1,27 @@
+{
+  "protocol": "QSOL-THOTH/CONCAP-COMPATIBILITY/1",
+  "schema_version": "1.0.0",
+  "role_versioning": {
+    "id_pattern": "^concap\\.[a-z0-9_.-]+/[1-9][0-9]*$",
+    "semantic_change_requires_new_version": true,
+    "existing_version_semantics_immutable": true,
+    "new_version_backward_compatible_by_default": false,
+    "implicit_version_substitution": false,
+    "resolver_must_match_exact_declared_role_id": true
+  },
+  "allowed_in_place_changes": [
+    "non-semantic prose clarification that does not change selection, authority, privacy, or receiver behavior"
+  ],
+  "requires_new_role_version": [
+    "semantic role meaning changes",
+    "authority boundary changes",
+    "privacy meaning changes",
+    "receiver-style authority changes",
+    "source-class binding meaning changes"
+  ],
+  "boundaries": [
+    "CONCAP_ROLE_VERSION != CAPSULE_INSTANCE_VERSION",
+    "NEW_ROLE_VERSION != BACKWARD_COMPATIBLE_BY_DEFAULT",
+    "COMPATIBILITY_DECLARATION != AUTOMATIC_SUBSTITUTION"
+  ]
+}

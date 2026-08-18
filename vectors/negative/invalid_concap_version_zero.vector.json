@@ -1,0 +1,7 @@
+{
+  "protocol": "QSOL-THOTH/NEGATIVE-VECTOR/1",
+  "id": "invalid_concap_version_zero",
+  "case": "registry_invalid_version",
+  "expected_error": "E_REGISTRY_ROLE_ID",
+  "parameters": {}
+}

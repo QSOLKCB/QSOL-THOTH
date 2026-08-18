@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.invalid/schemas/thoth-ess-style-v1.json",
+  "title": "QSOL-THOTH ESS Style Machine",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol",
+    "schema_version",
+    "selection",
+    "states",
+    "transition_contract",
+    "boundaries"
+  ],
+  "properties": {
+    "protocol": {
+      "const": "QSOL-THOTH/ESS-STYLE/1"
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*\\.[0-9]+\\.[0-9]+$"
+    },
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "explicit_declared_style_wins",
+        "otherwise_use_route_default",
+        "unknown_style_policy",
+        "tie_break"
+      ],
+      "properties": {
+        "explicit_declared_style_wins": {
+          "const": true
+        },
+        "otherwise_use_route_default": {
+          "const": true
+        },
+        "unknown_style_policy": {
+          "const": "fail_closed"
+        },
+        "tie_break": {
+          "const": "none-required-exact-token-selection"
+        }
+      }
+    },
+    "states": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "order",
+          "receiver_role",
+          "support_concaps"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9_.-]+$",
+            "minLength": 1
+          },
+          "order": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "receiver_role": {
+            "type": "string",
+            "minLength": 1
+          },
+          "support_concaps": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^concap\\.[a-z0-9_.-]+/[1-9][0-9]*$"
+            },
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "transition_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "canonical_input",
+        "model_inferred_style_switching",
+        "wall_clock_input",
+        "random_input",
+        "network_input",
+        "style_chatter_prevention"
+      ],
+      "properties": {
+        "canonical_input": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model_inferred_style_switching": {
+          "const": false
+        },
+        "wall_clock_input": {
+          "const": false
+        },
+        "random_input": {
+          "const": false
+        },
+        "network_input": {
+          "const": false
+        },
+        "style_chatter_prevention": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "boundaries": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  }
+}

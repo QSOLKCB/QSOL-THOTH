@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.invalid/schemas/thoth-router-v1.json",
+  "title": "QSOL-THOTH Router",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol",
+    "schema_version",
+    "unknown_intent_policy",
+    "intent_token_pattern",
+    "routes",
+    "selection_contract",
+    "boundaries"
+  ],
+  "properties": {
+    "protocol": {
+      "const": "QSOL-THOTH/ROUTER/1"
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*\\.[0-9]+\\.[0-9]+$"
+    },
+    "unknown_intent_policy": {
+      "const": "fail_closed"
+    },
+    "intent_token_pattern": {
+      "const": "^[a-z0-9_.-]+$"
+    },
+    "routes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "intent",
+          "aliases",
+          "order",
+          "default_style",
+          "concaps"
+        ],
+        "properties": {
+          "intent": {
+            "type": "string",
+            "pattern": "^[a-z0-9_.-]+$",
+            "minLength": 1
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9_.-]+$",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "order": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "default_style": {
+            "type": "string",
+            "pattern": "^[a-z0-9_.-]+$",
+            "minLength": 1
+          },
+          "concaps": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^concap\\.[a-z0-9_.-]+/[1-9][0-9]*$"
+            },
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "selection_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "canonical_matching",
+        "alias_resolution",
+        "fuzzy_matching",
+        "embedding_matching",
+        "model_guessing",
+        "route_priority"
+      ],
+      "properties": {
+        "canonical_matching": {
+          "const": "exact ASCII token"
+        },
+        "alias_resolution": {
+          "const": "exact declared alias only"
+        },
+        "fuzzy_matching": {
+          "const": false
+        },
+        "embedding_matching": {
+          "const": false
+        },
+        "model_guessing": {
+          "const": false
+        },
+        "route_priority": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "boundaries": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  }
+}

@@ -94,6 +94,28 @@ An explicit user style request wins when it names a declared state. Otherwise th
 
 Style support may request cultural CONCAPs, but those entries remain receiver guidance only.
 
+## CONCAP Conformance Suite
+
+Phase 1 freezes the public router before private source binding.
+
+```bash
+python3 tools/thoth.py validate
+python3 tools/thoth.py conformance
+python3 -m unittest discover -s tests -v
+```
+
+The conformance suite includes machine-readable schemas, frozen positive request→decision receipts, negative vectors with stable machine error codes, and an explicit role-version compatibility policy.
+
+```text
+SAME_REQUEST + SAME_CONFIGURATION + SAME_IMPLEMENTATION
+= SAME_DECISION_BYTES
+
+IMPLEMENTATION_CHANGE != SILENT_VECTOR_REFRESH
+NEW_ROLE_VERSION != BACKWARD_COMPATIBLE_BY_DEFAULT
+```
+
+See `CONFORMANCE.md`.
+
 ## Hard boundaries
 
 ```text
@@ -119,6 +141,12 @@ Validate all public contracts:
 python3 tools/thoth.py validate
 ```
 
+Replay the frozen conformance vectors:
+
+```bash
+python3 tools/thoth.py conformance
+```
+
 Route an intent:
 
 ```bash
@@ -131,7 +159,7 @@ Explicitly select a declared receiver style:
 python3 tools/thoth.py route --intent software_review --style australian_humour
 ```
 
-The output is canonical JSON and includes configuration, request, and decision SHA-256 receipts.
+The route output is canonical JSON and includes configuration, implementation, request, and decision SHA-256 receipts.
 
 ## Public/private boundary
 
@@ -139,9 +167,10 @@ QSOL-THOTH is intentionally public. It may publish:
 
 - CONCAP ids and roles;
 - routing policy;
+- role-version compatibility policy;
 - style-state policy;
 - schemas;
-- synthetic requests and tests;
+- synthetic requests and conformance vectors;
 - deterministic routing code.
 
 It must not publish:

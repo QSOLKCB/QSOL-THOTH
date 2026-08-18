@@ -34,6 +34,9 @@ jobs:
       - name: Validate public contracts
         run: python3 tools/thoth.py validate
 
+      - name: Replay CONCAP conformance suite
+        run: python3 tools/thoth.py conformance
+
       - name: Run unit tests
         run: python3 -m unittest discover -s tests -v
 
@@ -42,6 +45,12 @@ jobs:
           python3 tools/thoth.py route --intent comedy > /tmp/thoth-a.json
           python3 tools/thoth.py route --intent comedy > /tmp/thoth-b.json
           cmp /tmp/thoth-a.json /tmp/thoth-b.json
+
+      - name: Frozen conformance report smoke test
+        run: |
+          python3 tools/thoth.py conformance > /tmp/conformance-a.json
+          python3 tools/thoth.py conformance > /tmp/conformance-b.json
+          cmp /tmp/conformance-a.json /tmp/conformance-b.json
 
       - name: ESS override smoke test
         run: python3 tools/thoth.py route --intent software_review --style australian_humour

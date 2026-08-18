@@ -1,0 +1,7 @@
+{
+  "protocol": "QSOL-THOTH/NEGATIVE-VECTOR/1",
+  "id": "unknown_style_support_concap",
+  "case": "style_unknown_support_concap",
+  "expected_error": "E_STYLE_UNKNOWN_CONCAP",
+  "parameters": {}
+}
