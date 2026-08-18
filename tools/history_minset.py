@@ -82,10 +82,30 @@ def exact_keys(value: dict[str, Any], expected: set[str], where: str) -> None:
     require(not missing, "E_HISTORY_FIELDS", f"{where}: missing fields: {missing}")
 
 
+def validate_string_array(
+    value: Any,
+    code: str,
+    where: str,
+    *,
+    token: bool = False,
+    non_empty: bool = False,
+) -> list[str]:
+    require(isinstance(value, list), code, f"{where} must be an array")
+    if non_empty:
+        require(bool(value), code, f"{where} must be non-empty")
+    for item in value:
+        require(isinstance(item, str), code, f"{where} entries must be strings")
+        require(bool(item), code, f"{where} entries must be non-empty")
+        if token:
+            require(TOKEN.fullmatch(item) is not None, code, f"invalid token in {where}: {item!r}")
+    require(len(value) == len(set(value)), code, f"{where} must contain unique entries")
+    return value
+
+
 def validate_boundaries(value: Any, code: str, where: str) -> None:
-    require(isinstance(value, list) and len(value) == len(set(value)), code, f"{where} must be a unique array")
+    boundaries = validate_string_array(value, code, where)
     for boundary in PLAN_BOUNDARIES:
-        require(boundary in value, code, f"missing boundary: {boundary}")
+        require(boundary in boundaries, code, f"missing boundary: {boundary}")
 
 
 def validate_policy(policy: dict[str, Any]) -> None:
@@ -111,16 +131,11 @@ def validate_record(record: dict[str, Any], index: int | str) -> None:
     require(isinstance(record_id, str) and TOKEN.fullmatch(record_id), "E_HISTORY_RECORD_ID", f"invalid record id: {record_id!r}")
     order = record["order"]
     require(isinstance(order, int) and not isinstance(order, bool) and order > 0, "E_HISTORY_RECORD_ORDER", f"invalid order for {record_id}")
-    require(record["kind"] in {"detail", "bridge", "anchor"}, "E_HISTORY_RECORD_KIND", f"invalid kind for {record_id}")
+    kind = record["kind"]
+    require(isinstance(kind, str) and kind in {"detail", "bridge", "anchor"}, "E_HISTORY_RECORD_KIND", f"invalid kind for {record_id}")
     require(isinstance(record["summary"], str) and record["summary"], "E_HISTORY_RECORD_SUMMARY", f"summary missing for {record_id}")
-    for field in ("claims", "requires"):
-        values = record[field]
-        require(isinstance(values, list) and len(values) == len(set(values)), "E_HISTORY_RECORD", f"{record_id}.{field} must be a unique array")
-    require(bool(record["claims"]), "E_HISTORY_RECORD", f"{record_id}.claims must be non-empty")
-    for claim in record["claims"]:
-        require(isinstance(claim, str) and TOKEN.fullmatch(claim), "E_HISTORY_RECORD", f"{record_id}: invalid claim {claim!r}")
-    for dependency in record["requires"]:
-        require(isinstance(dependency, str) and TOKEN.fullmatch(dependency), "E_HISTORY_RECORD", f"{record_id}: invalid dependency {dependency!r}")
+    validate_string_array(record["claims"], "E_HISTORY_RECORD", f"{record_id}.claims", token=True, non_empty=True)
+    validate_string_array(record["requires"], "E_HISTORY_RECORD", f"{record_id}.requires", token=True)
 
 
 def validate_dataset(dataset: dict[str, Any]) -> None:
@@ -129,11 +144,13 @@ def validate_dataset(dataset: dict[str, Any]) -> None:
     require(isinstance(dataset["schema_version"], str) and SEMVER.fullmatch(dataset["schema_version"]), "E_HISTORY_DATASET_VERSION", "invalid dataset schema_version")
     require(isinstance(dataset["id"], str) and TOKEN.fullmatch(dataset["id"]), "E_HISTORY_DATASET_ID", "invalid dataset id")
     require(dataset["authority"] == "demonstration-only", "E_HISTORY_AUTHORITY", "demo dataset must not claim factual authority")
-    obligations = dataset["retention_obligations"]
-    require(isinstance(obligations, list) and obligations, "E_HISTORY_OBLIGATIONS", "retention_obligations must be non-empty")
-    require(len(obligations) == len(set(obligations)), "E_HISTORY_OBLIGATIONS", "duplicate retention obligation")
-    for claim in obligations:
-        require(isinstance(claim, str) and TOKEN.fullmatch(claim), "E_HISTORY_OBLIGATIONS", f"invalid obligation: {claim!r}")
+    obligations = validate_string_array(
+        dataset["retention_obligations"],
+        "E_HISTORY_OBLIGATIONS",
+        "retention_obligations",
+        token=True,
+        non_empty=True,
+    )
     records = dataset["records"]
     require(isinstance(records, list) and records, "E_HISTORY_RECORDS", "records must be non-empty")
     ids: set[str] = set()
@@ -147,6 +164,7 @@ def validate_dataset(dataset: dict[str, Any]) -> None:
     for record in records:
         for dependency in record["requires"]:
             require(dependency in ids, "E_HISTORY_DEPENDENCY", f"{record['id']}: unknown dependency {dependency}")
+    require(bool(obligations), "E_HISTORY_OBLIGATIONS", "retention_obligations must be non-empty")
     validate_boundaries(dataset["boundaries"], "E_HISTORY_BOUNDARIES", "dataset boundaries")
 
 
@@ -156,16 +174,29 @@ def record_sort_key(record: dict[str, Any]) -> tuple[int, bytes]:
 
 def _validate_dependency_closure(records: dict[str, dict[str, Any]]) -> None:
     complete: set[str] = set()
-    def visit(record_id: str, stack: tuple[str, ...]) -> None:
-        if record_id in complete:
-            return
-        require(record_id not in stack, "E_HISTORY_DEPENDENCY_CYCLE", f"dependency cycle at {record_id}")
-        for dependency in records[record_id]["requires"]:
-            require(dependency in records, "E_HISTORY_DEPENDENCY", f"{record_id}: missing dependency {dependency}")
-            visit(dependency, stack + (record_id,))
-        complete.add(record_id)
-    for record_id in sorted(records, key=lambda value: value.encode("utf-8")):
-        visit(record_id, ())
+    active: set[str] = set()
+    ordered_ids = sorted(records, key=lambda value: value.encode("utf-8"))
+    for start in ordered_ids:
+        if start in complete:
+            continue
+        stack: list[tuple[str, bool]] = [(start, False)]
+        while stack:
+            record_id, exiting = stack.pop()
+            if exiting:
+                active.discard(record_id)
+                complete.add(record_id)
+                continue
+            if record_id in complete:
+                continue
+            require(record_id not in active, "E_HISTORY_DEPENDENCY_CYCLE", f"dependency cycle at {record_id}")
+            active.add(record_id)
+            stack.append((record_id, True))
+            dependencies = sorted(records[record_id]["requires"], key=lambda value: value.encode("utf-8"), reverse=True)
+            for dependency in dependencies:
+                require(dependency in records, "E_HISTORY_DEPENDENCY", f"{record_id}: missing dependency {dependency}")
+                require(dependency not in active, "E_HISTORY_DEPENDENCY_CYCLE", f"dependency cycle at {dependency}")
+                if dependency not in complete:
+                    stack.append((dependency, False))
 
 
 def make_basis(dataset: dict[str, Any], policy: dict[str, Any], plan: dict[str, Any]) -> dict[str, Any]:
@@ -191,8 +222,13 @@ def validate_basis(basis: dict[str, Any]) -> None:
     for field in ("dataset_sha256", "policy_sha256", "plan_sha256", "basis_sha256"):
         value = basis[field]
         require(isinstance(value, str) and re.fullmatch(r"sha256:[0-9a-f]{64}", value), "E_HISTORY_BASIS", f"invalid {field}")
-    obligations = basis["retention_obligations"]
-    require(isinstance(obligations, list) and obligations and len(obligations) == len(set(obligations)), "E_HISTORY_BASIS", "basis obligations must be unique and non-empty")
+    obligations = validate_string_array(
+        basis["retention_obligations"],
+        "E_HISTORY_BASIS",
+        "basis obligations",
+        token=True,
+        non_empty=True,
+    )
     records_list = basis["records"]
     require(isinstance(records_list, list) and records_list, "E_HISTORY_BASIS", "basis records must be non-empty")
     records: dict[str, dict[str, Any]] = {}
@@ -222,15 +258,29 @@ def plan_minimum(dataset: dict[str, Any], policy: dict[str, Any]) -> dict[str, A
     ordered_ids = [record["id"] for record in sorted(dataset["records"], key=record_sort_key)]
     record_bytes = {record_id: len(canonical_bytes(records[record_id])) for record_id in records}
     closure_cache: dict[str, frozenset[str]] = {}
+
     def dependency_closure(record_id: str) -> frozenset[str]:
-        if record_id in closure_cache:
-            return closure_cache[record_id]
-        out = {record_id}
-        for dependency in records[record_id]["requires"]:
-            out.update(dependency_closure(dependency))
+        cached = closure_cache.get(record_id)
+        if cached is not None:
+            return cached
+        out: set[str] = set()
+        stack = [record_id]
+        while stack:
+            current = stack.pop()
+            if current in out:
+                continue
+            cached_current = closure_cache.get(current)
+            if cached_current is not None:
+                out.update(cached_current)
+                continue
+            require(current in records, "E_HISTORY_DEPENDENCY", f"missing dependency {current}")
+            out.add(current)
+            dependencies = sorted(records[current]["requires"], key=lambda value: value.encode("utf-8"), reverse=True)
+            stack.extend(dependencies)
         frozen = frozenset(out)
         closure_cache[record_id] = frozen
         return frozen
+
     closure_claims: dict[str, frozenset[str]] = {}
     for record_id in ordered_ids:
         claims: set[str] = set()
@@ -248,15 +298,19 @@ def plan_minimum(dataset: dict[str, Any], policy: dict[str, Any]) -> dict[str, A
     best_selected: frozenset[str] | None = None
     best_key: tuple[int, int, tuple[bytes, ...]] | None = None
     visited: set[frozenset[str]] = set()
+
     def selection_cost(selected: frozenset[str]) -> int:
         return sum(record_bytes[record_id] for record_id in selected)
+
     def selection_key(selected: frozenset[str]) -> tuple[int, int, tuple[bytes, ...]]:
         return (selection_cost(selected), len(selected), tuple(sorted(record_id.encode("utf-8") for record_id in selected)))
+
     def covered_claims(selected: frozenset[str]) -> frozenset[str]:
         claims: set[str] = set()
         for record_id in selected:
             claims.update(records[record_id]["claims"])
         return frozenset(claims)
+
     def dfs(selected: frozenset[str]) -> None:
         nonlocal search_nodes, best_selected, best_key
         if selected in visited:
@@ -286,6 +340,7 @@ def plan_minimum(dataset: dict[str, Any], policy: dict[str, Any]) -> dict[str, A
             if best_key is not None and selection_cost(expanded) > best_key[0]:
                 continue
             dfs(expanded)
+
     dfs(frozenset())
     require(best_selected is not None and best_key is not None, "E_HISTORY_UNSATISFIABLE", "no satisfying historical basis exists")
     selected_ordered = [record_id for record_id in ordered_ids if record_id in best_selected]
