@@ -11,6 +11,7 @@
     "concaps",
     "request_sha256",
     "configuration_sha256",
+    "implementation_sha256",
     "decision_sha256",
     "boundaries"
   ],
@@ -36,6 +37,10 @@
       "pattern": "^sha256:[0-9a-f]{64}$"
     },
     "configuration_sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "implementation_sha256": {
       "type": "string",
       "pattern": "^sha256:[0-9a-f]{64}$"
     },
