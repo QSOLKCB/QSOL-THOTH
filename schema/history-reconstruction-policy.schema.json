@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.invalid/schemas/thoth-history-reconstruction-policy-v1.json",
+  "title": "QSOL-THOTH Historical Reconstruction Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol", "schema_version", "objective", "max_search_nodes", "tie_break", "boundaries"],
+  "properties": {
+    "protocol": {"const": "QSOL-THOTH/HISTORY-RECONSTRUCTION-POLICY/1"},
+    "schema_version": {"type": "string", "pattern": "^[1-9][0-9]*\\.[0-9]+\\.[0-9]+$"},
+    "objective": {"type":"object","additionalProperties":false,"required":["coverage","cost","dependencies","algorithm"],"properties":{"coverage":{"const":"all_retention_obligations"},"cost":{"const":"canonical_record_bytes"},"dependencies":{"const":"transitive_closure"},"algorithm":{"const":"exact_branch_and_bound"}}},
+    "max_search_nodes": {"type": "integer", "minimum": 1},
+    "tie_break": {"const": "total_bytes_then_record_count_then_utf8_ids"},
+    "boundaries": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+  }
+}
