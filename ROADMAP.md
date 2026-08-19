@@ -47,7 +47,7 @@
 
 - [x] Define private role-to-capsule instance metadata without exposing payloads publicly.
 - [x] Publish a strict public schema and validator for caller-supplied private instance-history metadata.
-- [x] Populate a real private accepted snapshot after capsule generation and fixed-point verification. **Gate satisfied:** QSOL-CAPSULES stores an immutable Snapshot A built from pinned source and generator commits; all five capsules were independently reproduced and fixed-point verified. THOTH retains only its explicitly `synthetic-conformance` fixture and exposes no private payloads.
+- [x] Populate a real accepted snapshot after capsule generation and fixed-point verification. The accepted payload and `accepted-private-metadata` history are retained and validated in private QSOL-CAPSULES; THOTH continues to publish only non-private conformance material.
 - [x] Support immutable historical instances of the same semantic CONCAP role across snapshots.
 - [x] Bind accepted instances to exact source commit, source projection, generator commit, policy, verification receipt, capsule hash, and byte size.
 - [x] Preserve append-only snapshot semantics with byte-identical prefix verification.
