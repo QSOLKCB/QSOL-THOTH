@@ -53,6 +53,8 @@ synthetic-conformance
 accepted-private-metadata
 ```
 
-This public repository ships only `synthetic-conformance` history. A real accepted snapshot remains an operational QSOL-CAPSULES gate: generate the private `.dat` bytes, verify their fixed points with the pinned QSOL-CONTROL implementation, commit the immutable private snapshot, then produce an `accepted-private-metadata` history. THOTH does not fabricate that evidence.
+This public repository intentionally continues to ship only the `synthetic-conformance` fixture. A real accepted snapshot and its `accepted-private-metadata` history now exist in private QSOL-CAPSULES after pinned capsule generation, fixed-point verification, repeat-pack byte comparison, immutable snapshot acceptance, and validation with this public THOTH contract.
+
+THOTH does not publish the private capsule payloads or turn their existence into factual authority.
 
 See `schema/concap-instance-history.schema.json`.
